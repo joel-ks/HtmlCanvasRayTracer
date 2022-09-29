@@ -1,0 +1,14 @@
+{
+  "name": "web-canvas-ray-tracer",
+  "author": "Joel Kusasira-Sutton",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc --project wwwroot/tsconfig.json",
+    "serve": "web-dev-server --config web-dev-server.config.mjs",
+    "watch": "tsc --watch --project wwwroot/tsconfig.json"
+  },
+  "devDependencies": {
+    "@web/dev-server": "^0.1.34",
+    "typescript": "^4.8.3"
+  }
+}

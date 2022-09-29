@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "outDir": "./js/",
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "sourceMap": true,
+
+        "strict": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "noImplicitAny": true,
+    },
+    "include": ["src/**/*"]
+}

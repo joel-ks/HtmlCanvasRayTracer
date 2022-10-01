@@ -1,5 +1,7 @@
-import { render } from "../rayTracer";
+import { render } from "../raytracer/rayTracer";
 import { WorkerRequest, WorkerUpdate } from "./workerMessageTypes";
+
+declare const self: DedicatedWorkerGlobalScope;
 
 const statusUpdate = (message: string) => {
     const update: WorkerUpdate = {
@@ -9,12 +11,12 @@ const statusUpdate = (message: string) => {
     postMessage(update);
 }
 
-onmessage = (e: MessageEvent<WorkerRequest>) => {
-    render(e.data, statusUpdate);
+self.addEventListener('message', (e: MessageEvent<WorkerRequest>) => {
+    render(e.data.width, e.data.height, e.data.data, statusUpdate);
 
     const update: WorkerUpdate = {
         message: "Done",
         completed: true
     }
     postMessage(update);
-};
+});

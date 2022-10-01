@@ -1,7 +1,10 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../tsconfig.base.json",
     "compilerOptions": {
-        "lib": ["WebWorker"]
+        "lib": ["WebWorker"],
+        "skipLibCheck": true // Because @types/node breaks WW types
     },
-    "files": ["worker.ts"]
+    "references": [
+        { "path": "../raytracer" }
+    ]
 }

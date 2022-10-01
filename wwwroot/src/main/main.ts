@@ -1,4 +1,4 @@
-import { WorkerRequest, WorkerUpdate } from "./worker/workerMessageTypes";
+import { WorkerRequest, WorkerUpdate } from "../worker/workerMessageTypes";
 
 const canvas = document.getElementById("output") as HTMLCanvasElement;
 const btnRender = document.getElementById("btn-render") as HTMLButtonElement;
@@ -26,19 +26,19 @@ onload = function () {
     // Worker { type: "module" } isn't yet supported in Firefox - https://bugzilla.mozilla.org/show_bug.cgi?id=1247687
     const renderWorker = new Worker("./js/worker/worker.js", { type: "module" });
 
-    renderWorker.onmessage = (e: MessageEvent<WorkerUpdate>) => {
+    renderWorker.addEventListener('message', (e: MessageEvent<WorkerUpdate>) => {
         if (info) info.textContent = e.data.message;
         renderRunning = !e.data.completed;
         btnRender.disabled = !e.data.completed;
-    };
+    });
 
-    renderWorker.onerror = () => {
+    renderWorker.addEventListener('error', () => {
         if (info) info.textContent = "An error occurred while rendering. Check the console for details.";
         renderRunning = false;
         btnRender.disabled = false;
-    };
+    });
 
-    btnRender.onclick = () => {
+    btnRender.addEventListener('click', () => {
         try {
             btnRender.disabled = true;
 
@@ -56,7 +56,7 @@ onload = function () {
             btnRender.disabled = false;
             throw e;
         }
-    };
+    });
 };
 
 function startUpdatingRenderView(sabView: Uint8ClampedArray, width: number, height: number, ctx2d: CanvasRenderingContext2D) {

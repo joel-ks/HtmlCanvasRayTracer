@@ -1,15 +1,19 @@
 {
     "compilerOptions": {
-        "outDir": "./js/",
+        "outDir": "../js/",
+        "declarationDir": "../types",
+        "rootDir": ".",
+        "composite": true,
+
         "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "Node",
         "sourceMap": true,
+        "declarationMap": true,
 
         "strict": true,
         "allowJs": true,
-        "skipLibCheck": true,
+        "checkJs": true,
         "noImplicitAny": true,
-    },
-    "include": ["src/**/*"]
+    }
 }

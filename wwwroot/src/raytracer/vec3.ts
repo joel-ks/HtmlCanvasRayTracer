@@ -50,6 +50,10 @@ export function normalise(v: Vec3): Vec3 {
     return scale(v, 1 / length(v));
 }
 
+export function lerp(v1: Vec3, v2: Vec3, t: number): Vec3 {
+    return add(scale(v1, (1.0 - t)), scale(v2, t))
+}
+
 export function toString(v: Vec3) {
     return `(${v.x}, ${v.y}, ${v.z})`;
 }

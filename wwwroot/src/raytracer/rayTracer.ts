@@ -1,15 +1,21 @@
+import ImageStream from "./ImageStream";
+import { Vec3 } from "./vec3";
+
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
-    const imageDataView = new Uint8ClampedArray(data);
+    const imageStream = new ImageStream(data);
 
     let imageDataIndex = -1;
     for (let y = 0; y < height; ++y) {
         statusUpdate(`Progress: ${Math.floor((y / height) * 100)}%`);
 
         for (let x = 0; x < width; ++x) {
-            imageDataView[++imageDataIndex] = (x / width) * 255;
-            imageDataView[++imageDataIndex] = ((width - x) / width) * 255;
-            imageDataView[++imageDataIndex] = (y / height) * 255;
-            imageDataView[++imageDataIndex] = 255;
+            const pixelColour: Vec3 = {
+                x: x / width,
+                y: (width - x - 1) / width,
+                z: y / height
+            }
+            
+            imageStream.putRgba(pixelColour, 255);
         }
 
         // Spin for a while so we can see the progress

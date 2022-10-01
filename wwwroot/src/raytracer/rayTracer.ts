@@ -1,6 +1,6 @@
 import ImageStream from "./ImageStream";
 import Ray from "./Ray";
-import { add, lerp, normalise, scale, subtract, Vec3 } from "./vec3";
+import { add, dot, lerp, normalise, scale, subtract, Vec3 } from "./vec3";
 
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
     const aspectRatio = width / height;
@@ -40,9 +40,37 @@ export function render(width: number, height: number, data: SharedArrayBuffer, s
     }
 }
 
+function hitSphere(centre: Vec3, radius: number, ray: Ray): boolean {
+    // Equation for ray(O,d) intersects sphere(C,r):
+    // => t^2*(d⋅d)+2*t*(d⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
+    // Solve for t to determine if ray intersects at any point
+    // => Quadratic discriminant = b^2 - 4*a*c where
+    //      - a = (d⋅d)
+    //      - b = 2*(d⋅oc)
+    //      - c = (oc⋅oc)−r^2
+    // => Result
+    //      - discriminant = 0 => 1 solution => ray is tangent
+    //      - discriminant < 0 => imaginary solution => no intersection
+    //      - discriminant > 0 => 2 solutions => ray intersects
+    const oc = subtract(ray.origin, centre);
+    const a = dot(ray.direction, ray.direction);
+    const b = 2 * dot(oc, ray.direction);
+    const c = dot(oc, oc) - radius*radius;
+    const discriminant = b*b - 4*a*c;
+
+    return discriminant > 0;
+}
+
+const spherePos = { x: 0, y: 0, z: -1 };
+const sphereRadius = 0.5;
+const sphereColour = { x: 1.0, y: 0.0, z: 0.0 };
+
 const colour1 = { x: 1.0, y: 1.0, z: 1.0 };
 const colour2 = { x: 0.5, y: 0.7, z: 1.0 };
+
 function rayColour(ray: Ray): Vec3 {
+    if (hitSphere(spherePos, sphereRadius, ray)) return sphereColour;
+
     const normalisedDirection = normalise(ray.direction);
     const t = 0.5 * (normalisedDirection.y + 1.0);
     return lerp(colour1, colour2, t);

@@ -28,7 +28,11 @@ export function scale(v: Vec3, scale: number): Vec3 {
     }
 }
 
-export function dot(v1: Vec3, v2: Vec3): number {
+export function dot(v1: Vec3): number
+export function dot(v1: Vec3, v2: Vec3): number
+export function dot(v1: Vec3, v2?: Vec3): number {
+    if (!v2) v2 = v1;
+
     return v1.x * v2.x +
         v1.y * v2.y +
         v1.z * v2.z;
@@ -43,7 +47,7 @@ export function cross(v1: Vec3, v2: Vec3): Vec3 {
 }
 
 export function length(v: Vec3): number {
-    return Math.sqrt(dot(v, v));
+    return Math.sqrt(dot(v));
 }
 
 export function normalise(v: Vec3): Vec3 {

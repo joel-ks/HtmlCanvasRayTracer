@@ -35,43 +35,50 @@ export function render(width: number, height: number, data: SharedArrayBuffer, s
             );
             const ray = new Ray(origin, rayDir);
             
-            imageStream.putRgba(rayColour(ray), 255);
+            imageStream.putRgba(rayColour(ray), 1);
         }
     }
 }
 
-function hitSphere(centre: Vec3, radius: number, ray: Ray): boolean {
-    // Equation for ray(O,d) intersects sphere(C,r):
-    // => t^2*(d⋅d)+2*t*(d⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
+/**
+ * @returns the location on the ray that intersects with the sphere, or -1 if no intersection occurs
+ */
+function hitSphere(centre: Vec3, radius: number, ray: Ray): number {
+    // Equation for ray(O,D) intersects sphere(C,r):
+    // => t^2*(D⋅D)+2*t*(D⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
     // Solve for t to determine if ray intersects at any point
-    // => Quadratic discriminant = b^2 - 4*a*c where
-    //      - a = (d⋅d)
-    //      - b = 2*(d⋅oc)
-    //      - c = (oc⋅oc)−r^2
-    // => Result
-    //      - discriminant = 0 => 1 solution => ray is tangent
-    //      - discriminant < 0 => imaginary solution => no intersection
-    //      - discriminant > 0 => 2 solutions => ray intersects
+    // => Quadratic formula: (-b +- sqrt(b^2 - 4*a*c)) / 2*a where
+    //      - a = (D⋅D)
+    //      - b = 2*(D⋅(O-C))
+    //      - c = ((O-C)⋅(O-C))−r^2
+    // => b is a multiple of 2 so divide through to simplify (h = b/2 = D⋅(O-C)): (-h +- sqrt(h^2 - a*c)) / a
     const oc = subtract(ray.origin, centre);
     const a = dot(ray.direction, ray.direction);
-    const b = 2 * dot(oc, ray.direction);
-    const c = dot(oc, oc) - radius*radius;
-    const discriminant = b*b - 4*a*c;
+    const halfB = dot(ray.direction, oc);
+    const c = dot(oc) - radius*radius;
+    const discriminant = halfB*halfB - a*c;
 
-    return discriminant > 0;
+    if (discriminant < 0) return -1; // Imaginary solution - no hit
+    else return (-halfB - Math.sqrt(discriminant)) / (a); // Only taking the nearest solution?
 }
 
 const spherePos = { x: 0, y: 0, z: -1 };
 const sphereRadius = 0.5;
-const sphereColour = { x: 1.0, y: 0.0, z: 0.0 };
 
 const colour1 = { x: 1.0, y: 1.0, z: 1.0 };
 const colour2 = { x: 0.5, y: 0.7, z: 1.0 };
 
 function rayColour(ray: Ray): Vec3 {
-    if (hitSphere(spherePos, sphereRadius, ray)) return sphereColour;
+    let t = hitSphere(spherePos, sphereRadius, ray);
+
+    if (t > 0) {
+        // Use the normal vector of the sphere at the intersection point as the colour
+        // but transformed so all components are in [0,1)
+        const normal = normalise(subtract(ray.at(t), spherePos));
+        return scale(add(normal, { x: 1, y: 1, z: 1 }), 0.5);
+    }
 
     const normalisedDirection = normalise(ray.direction);
-    const t = 0.5 * (normalisedDirection.y + 1.0);
+    t = 0.5 * (normalisedDirection.y + 1.0);
     return lerp(colour1, colour2, t);
 }

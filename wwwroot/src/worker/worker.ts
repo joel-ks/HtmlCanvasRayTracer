@@ -12,10 +12,12 @@ const statusUpdate = (message: string) => {
 }
 
 self.addEventListener('message', (e: MessageEvent<WorkerRequest>) => {
+    const startTime = performance.now();
     render(e.data.width, e.data.height, e.data.data, statusUpdate);
 
+    const timeElapsed = performance.now() - startTime;
     const update: WorkerUpdate = {
-        message: "Done",
+        message: `Completed in ${Math.round(timeElapsed)}ms`,
         completed: true
     }
     postMessage(update);

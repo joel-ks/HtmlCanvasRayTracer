@@ -17,8 +17,8 @@ export default class Camera {
         this.#vertical = { x: 0, y: height, z: 0 };
         this.#lowerLeft = subtract(
             subtract(
-                subtract(this.#origin, scale(this.#horizontal, 1.0/2.0)),
-                scale(this.#vertical, 1.0/2.0)
+                subtract(this.#origin, scale(this.#horizontal, 1.0 / 2.0)),
+                scale(this.#vertical, 1.0 / 2.0)
             ), { x: 0, y: 0, z: focalLength }
         );
     }

@@ -3,7 +3,7 @@ import { HittableList, IHittable, Sphere } from "./hittable";
 import ImageStream from "./ImageStream";
 import { rand } from "./numberUtils";
 import Ray from "./Ray";
-import { add, lerp, normalise, scale, subtract, Vec3 } from "./vec3";
+import { add, lerp, normalise, scale, Vec3 } from "./vec3";
 
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
 
@@ -23,21 +23,20 @@ export function render(width: number, height: number, data: SharedArrayBuffer, s
     const imageStream = new ImageStream(data);
 
     // We're filling the buffer from the top line down but our coordinate space is y-up
-    for (let y = height-1; y >= 0; --y) {
+    for (let y = height - 1; y >= 0; --y) {
         statusUpdate(`Progress: ${Math.floor(((height - 1 - y) / height) * 100)}%`);
 
         for (let x = 0; x < width; ++x) {
             let pixelColour: Vec3 = { x: 0, y: 0, z: 0 };
 
-            for (let s = 0; s < samplesPerPixel; ++s)
-            {
+            for (let s = 0; s < samplesPerPixel; ++s) {
                 const u = (x + rand()) / (width - 1);
                 const v = (y + rand()) / (height - 1);
 
                 const ray = camera.getRay(u, v);
                 pixelColour = add(pixelColour, rayColour(ray, world));
             }
-            
+
             imageStream.putRgba(scale(pixelColour, 1.0 / samplesPerPixel), 1);
         }
     }

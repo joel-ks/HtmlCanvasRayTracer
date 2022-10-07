@@ -1,53 +1,44 @@
+import Camera from "./Camera";
 import { HittableList, IHittable, Sphere } from "./hittable";
 import ImageStream from "./ImageStream";
+import { rand } from "./numberUtils";
 import Ray from "./Ray";
 import { add, lerp, normalise, scale, subtract, Vec3 } from "./vec3";
 
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
+
+    // Image
     const aspectRatio = width / height;
+    const samplesPerPixel = 100;
 
     // World
-    
     const world = new HittableList();
     world.add(new Sphere({ x: 0, y: 0, z: -1 }, 0.5));
     world.add(new Sphere({ x: 0, y: -100.5, z: -1 }, 100));
 
     // Camera
-
-    const origin: Vec3 = { x: 0, y: 0, z: 0 };
-    const viewportHeight = 2.0;
-    const viewportWidth = aspectRatio * viewportHeight;
-    const focalLength = 1.0;
-
-    const horizontal: Vec3 = { x: viewportWidth, y: 0, z: 0 };
-    const vertical: Vec3 = { x: 0, y: viewportHeight, z: 0 };
-    const lowerLeft = subtract(
-        subtract(
-            subtract(origin, scale(horizontal, 1/2)),
-            scale(vertical, 1/2)
-        ), { x: 0, y: 0, z: focalLength }
-    );
+    const camera = new Camera(aspectRatio);
 
     // Render
-
     const imageStream = new ImageStream(data);
 
-    for (let y = height-1; y >= 0; --y) { // We're filling the buffer from the top line down
-        statusUpdate(`Progress: ${Math.floor((y / height) * 100)}%`);
+    // We're filling the buffer from the top line down but our coordinate space is y-up
+    for (let y = height-1; y >= 0; --y) {
+        statusUpdate(`Progress: ${Math.floor(((height - 1 - y) / height) * 100)}%`);
 
         for (let x = 0; x < width; ++x) {
-            const u = x / (width - 1);
-            const v = y / (height - 1);
+            let pixelColour: Vec3 = { x: 0, y: 0, z: 0 };
 
-            const rayDir = subtract(
-                add(
-                    add(lowerLeft, scale(horizontal, u)),
-                    scale(vertical, v)
-                ), origin
-            );
-            const ray = new Ray(origin, rayDir);
+            for (let s = 0; s < samplesPerPixel; ++s)
+            {
+                const u = (x + rand()) / (width - 1);
+                const v = (y + rand()) / (height - 1);
+
+                const ray = camera.getRay(u, v);
+                pixelColour = add(pixelColour, rayColour(ray, world));
+            }
             
-            imageStream.putRgba(rayColour(ray, world), 1);
+            imageStream.putRgba(scale(pixelColour, 1.0 / samplesPerPixel), 1);
         }
     }
 }

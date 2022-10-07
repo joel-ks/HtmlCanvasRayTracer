@@ -1,3 +1,4 @@
+import { clamp } from "./numberUtils";
 import { Vec3 } from "./vec3";
 
 export default class ImageStream {
@@ -9,9 +10,9 @@ export default class ImageStream {
     }
 
     putRgba(colour: Vec3, alpha: number) {
-        this.#data[++this.#index] = colour.x * 256;
-        this.#data[++this.#index] = colour.y * 256;
-        this.#data[++this.#index] = colour.z * 256;
-        this.#data[++this.#index] = alpha * 256;
+        this.#data[++this.#index] = clamp(colour.x) * 255;
+        this.#data[++this.#index] = clamp(colour.y) * 255;
+        this.#data[++this.#index] = clamp(colour.z) * 255;
+        this.#data[++this.#index] = clamp(alpha) * 255;
     }
 }

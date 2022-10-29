@@ -1,3 +1,5 @@
+import { rand } from "./numberUtils";
+
 export interface Vec3 {
     x: number;
     y: number;
@@ -60,4 +62,25 @@ export function lerp(v1: Vec3, v2: Vec3, t: number): Vec3 {
 
 export function toString(v: Vec3) {
     return `(${v.x}, ${v.y}, ${v.z})`;
+}
+
+export function randomVec3(min?: number, max?: number) {
+    return {
+        x: rand(min, max),
+        y: rand(min, max),
+        z: rand(min, max)
+    };
+}
+
+export function randomVec3InUnitSphere() {
+    while (true) {
+        const v = randomVec3(-1, 1);
+        if (dot(v) < 1) return v;
+    }
+}
+
+export function randomVec3InHemisphere(normal: Vec3) {
+    const inUnitSphere = randomVec3InUnitSphere();
+    if (dot(inUnitSphere, normal) >= 0.0) return inUnitSphere;
+    else return scale(inUnitSphere, -1);
 }

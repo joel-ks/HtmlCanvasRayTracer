@@ -110,3 +110,10 @@ export function randomVec3InHemisphere(normal: Vec3) {
     if (dot(inUnitSphere, normal) >= 0.0) return inUnitSphere;
     else return scale(inUnitSphere, -1);
 }
+
+export function randomVec3InUnitDisk() {
+    while (true) {
+        const v = { x: rand(-1, 1), y: rand(-1, 1), z: 0 };
+        if (dot(v) < 1) return v;
+    }
+}

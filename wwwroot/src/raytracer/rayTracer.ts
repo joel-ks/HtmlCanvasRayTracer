@@ -4,7 +4,7 @@ import ImageStream from "./ImageStream";
 import { DielectricMaterial, LambertianMaterial, MetalMaterial } from "./material";
 import { degreesToRadians, rand } from "./numberUtils";
 import Ray from "./Ray";
-import { add, lerp, multiply, normalise, scale, Vec3 } from "./vec3";
+import { add, dot, length, lerp, multiply, normalise, scale, subtract, Vec3 } from "./vec3";
 
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
 
@@ -28,11 +28,13 @@ export function render(width: number, height: number, data: SharedArrayBuffer, s
     world.add(new Sphere({ x: 1, y: 0, z: -1 }, 0.5, rightMaterial));
 
     // Camera
-    const cameraPos = { x: -2, y: 2, z: 1 };
+    const cameraPos = { x: 3, y: 3, z: 2 };
     const cameraLookAt = { x: 0, y: 0, z: -1 };
     const cameraUp = { x: 0, y: 1, z: 0 };
     const cameraFov = degreesToRadians(20.0);
-    const camera = new Camera(cameraPos, cameraLookAt, cameraUp, cameraFov, aspectRatio);
+    const cameraAperture = 2.0;
+    const cameraFocalLength = length(subtract(cameraPos, cameraLookAt));
+    const camera = new Camera(cameraPos, cameraLookAt, cameraUp, cameraFov, aspectRatio, cameraAperture, cameraFocalLength);
 
     // Render
     const imageStream = new ImageStream(data);

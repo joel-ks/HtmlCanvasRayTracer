@@ -22,11 +22,11 @@ export function subtract(v1: Vec3, v2: Vec3): Vec3 {
     };
 }
 
-export function multiply(u: Vec3, v: Vec3): Vec3 {
+export function multiply(v1: Vec3, v2: Vec3): Vec3 {
     return {
-        x: u.x * v.x,
-        y: u.y * v.y,
-        z: u.z * v.z,
+        x: v1.x * v2.x,
+        y: v1.y * v2.y,
+        z: v1.z * v2.z,
     }
 }
 
@@ -56,8 +56,15 @@ export function cross(v1: Vec3, v2: Vec3): Vec3 {
     };
 }
 
-export function reflect(v: Vec3, n: Vec3): Vec3 {
-    return subtract(v, scale(n, 2 * dot(v, n)));
+export function reflect(v: Vec3, normal: Vec3): Vec3 {
+    return subtract(v, scale(normal, 2 * dot(v, normal)));
+}
+
+export function refract(v: Vec3, normal: Vec3, refractionIndexRatio: number) {
+    const cosTheta = Math.min(dot(scale(v, -1), normal), 1.0);
+    const perpendicular = scale(add(v, scale(normal, cosTheta)), refractionIndexRatio);
+    const parallel = scale(normal, -Math.sqrt(Math.abs(1.0 - dot(perpendicular))));
+    return add(perpendicular, parallel);
 }
 
 export function length(v: Vec3): number {

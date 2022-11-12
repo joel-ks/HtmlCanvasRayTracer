@@ -2,9 +2,9 @@ import Camera from "./Camera";
 import { HittableList, IHittable, Sphere } from "./hittable";
 import ImageStream from "./ImageStream";
 import { DielectricMaterial, LambertianMaterial, MetalMaterial } from "./material";
-import { rand } from "./numberUtils";
+import { degreesToRadians, rand } from "./numberUtils";
 import Ray from "./Ray";
-import { add, lerp, multiply, normalise, randomVec3InHemisphere, randomVec3InUnitSphere, scale, Vec3 } from "./vec3";
+import { add, lerp, multiply, normalise, scale, Vec3 } from "./vec3";
 
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
 
@@ -28,7 +28,11 @@ export function render(width: number, height: number, data: SharedArrayBuffer, s
     world.add(new Sphere({ x: 1, y: 0, z: -1 }, 0.5, rightMaterial));
 
     // Camera
-    const camera = new Camera(aspectRatio);
+    const cameraPos = { x: -2, y: 2, z: 1 };
+    const cameraLookAt = { x: 0, y: 0, z: -1 };
+    const cameraUp = { x: 0, y: 1, z: 0 };
+    const cameraFov = degreesToRadians(20.0);
+    const camera = new Camera(cameraPos, cameraLookAt, cameraUp, cameraFov, aspectRatio);
 
     // Render
     const imageStream = new ImageStream(data);

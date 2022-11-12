@@ -1,5 +1,5 @@
 import Ray from "./Ray";
-import { add, scale, subtract, Vec3 } from "./vec3";
+import { add, cross, normalise, scale, subtract, Vec3 } from "./vec3";
 
 export default class Camera {
     #origin: Vec3;
@@ -7,27 +7,30 @@ export default class Camera {
     #horizontal: Vec3;
     #vertical: Vec3;
 
-    constructor(aspectRatio: number) {
-        const height = 2;
-        const width = aspectRatio * height;
-        const focalLength = 1;
+    constructor(position: Vec3, lookAt: Vec3, up: Vec3, vfovRadians: number, aspectRatio: number) {
+        const h = Math.tan(vfovRadians / 2);
 
-        this.#origin = { x: 0, y: 0, z: 0 };
-        this.#horizontal = { x: width, y: 0, z: 0 };
-        this.#vertical = { x: 0, y: height, z: 0 };
-        this.#lowerLeft = subtract(
-            subtract(
-                subtract(this.#origin, scale(this.#horizontal, 1.0 / 2.0)),
-                scale(this.#vertical, 1.0 / 2.0)
-            ), { x: 0, y: 0, z: focalLength }
-        );
+        const viewportHeight = 2 * h;
+        const viewportWidth = aspectRatio * viewportHeight;
+
+        const w = normalise(subtract(position, lookAt));
+        const u = normalise(cross(up, w));
+        const v = cross(w, u);
+
+        this.#origin = position;
+        this.#horizontal = scale(u, viewportWidth);
+        this.#vertical = scale(v, viewportHeight);
+        this.#lowerLeft = subtract(this.#origin, add(
+            scale(this.#horizontal, 1/2),
+            add(scale(this.#vertical, 1/2), w)
+        ));
     }
 
-    getRay(u: number, v: number): Ray {
+    getRay(s: number, t: number): Ray {
         const direction = subtract(
             add(
-                add(this.#lowerLeft, scale(this.#horizontal, u)),
-                scale(this.#vertical, v)
+                add(this.#lowerLeft, scale(this.#horizontal, s)),
+                scale(this.#vertical, t)
             ), this.#origin
         );
 

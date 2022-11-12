@@ -22,6 +22,14 @@ export function subtract(v1: Vec3, v2: Vec3): Vec3 {
     };
 }
 
+export function multiply(u: Vec3, v: Vec3): Vec3 {
+    return {
+        x: u.x * v.x,
+        y: u.y * v.y,
+        z: u.z * v.z,
+    }
+}
+
 export function scale(v: Vec3, scale: number): Vec3 {
     return {
         x: v.x * scale,
@@ -48,12 +56,23 @@ export function cross(v1: Vec3, v2: Vec3): Vec3 {
     };
 }
 
+export function reflect(v: Vec3, n: Vec3): Vec3 {
+    return subtract(v, scale(n, 2 * dot(v, n)));
+}
+
 export function length(v: Vec3): number {
     return Math.sqrt(dot(v));
 }
 
 export function normalise(v: Vec3): Vec3 {
     return scale(v, 1 / length(v));
+}
+
+export function nearZero(v: Vec3): boolean {
+    const epsilon = 1e-8;
+    return Math.abs(v.x) < epsilon
+        && Math.abs(v.y) < epsilon
+        && Math.abs(v.z) < epsilon;
 }
 
 export function lerp(v1: Vec3, v2: Vec3, t: number): Vec3 {

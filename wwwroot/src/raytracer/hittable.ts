@@ -1,9 +1,11 @@
+import { IMaterial } from "./material";
 import Ray from "./Ray";
 import { dot, scale, subtract, Vec3 } from "./vec3";
 
 export interface HitRecord {
     point: Vec3;
     normal: Vec3;
+    material: IMaterial;
     t: number;
     frontFace: boolean;
 }
@@ -38,12 +40,12 @@ export class HittableList implements IHittable {
 export class Sphere implements IHittable {
     #centre: Vec3;
     #radius: number;
+    #material: IMaterial;
 
-    constructor()
-    constructor(centre: Vec3, radius: number)
-    constructor(centre?: Vec3, radius?: number) {
-        this.#centre = centre ?? { x: 0, y: 0, z: 0 };
-        this.#radius = radius ?? 0;
+    constructor(centre: Vec3, radius: number, material: IMaterial) {
+        this.#centre = centre;
+        this.#radius = radius;
+        this.#material = material;
     }
 
     hit(ray: Ray, tMin: number, tMax: number): HitRecord | null {
@@ -75,8 +77,9 @@ export class Sphere implements IHittable {
         // Hit point and surface normal at hit point
         const point = ray.at(t);
         const [normal, frontFace] = correctNormalForFace(ray, scale(subtract(point, this.#centre), 1 / this.#radius));
+        const material = this.#material;
 
-        return { point, normal, t, frontFace };
+        return { point, normal, material, t, frontFace };
     }
 }
 

@@ -1,9 +1,10 @@
 import Camera from "./Camera";
 import { HittableList, IHittable, Sphere } from "./hittable";
 import ImageStream from "./ImageStream";
+import { LambertianMaterial, MetalMaterial } from "./material";
 import { rand } from "./numberUtils";
 import Ray from "./Ray";
-import { add, lerp, normalise, randomVec3InHemisphere, randomVec3InUnitSphere, scale, Vec3 } from "./vec3";
+import { add, lerp, multiply, normalise, randomVec3InHemisphere, randomVec3InUnitSphere, scale, Vec3 } from "./vec3";
 
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
 
@@ -14,8 +15,16 @@ export function render(width: number, height: number, data: SharedArrayBuffer, s
 
     // World
     const world = new HittableList();
-    world.add(new Sphere({ x: 0, y: 0, z: -1 }, 0.5));
-    world.add(new Sphere({ x: 0, y: -100.5, z: -1 }, 100));
+
+    const groundMaterial = new LambertianMaterial({ x: 0.8, y: 0.8, z: 0.0 });
+    const centreMaterial = new LambertianMaterial({ x: 0.7, y: 0.3, z: 0.3 });
+    const leftMaterial = new MetalMaterial({x: 0.8, y: 0.8, z: 0.8 }, 0.3);
+    const rightMaterial = new MetalMaterial({x: 0.8, y: 0.6, z: 0.2 }, 1.0);
+
+    world.add(new Sphere({ x: 0, y: -100.5, z: -1 }, 100, groundMaterial));
+    world.add(new Sphere({ x: 0, y: 0, z: -1 }, 0.5, centreMaterial));
+    world.add(new Sphere({ x: -1, y: 0, z: -1 }, 0.5, leftMaterial));
+    world.add(new Sphere({ x: 1, y: 0, z: -1 }, 0.5, rightMaterial));
 
     // Camera
     const camera = new Camera(aspectRatio);
@@ -63,11 +72,8 @@ function rayColour(ray: Ray, world: IHittable, maxBounces: number): Vec3 {
     const hitRecord = world.hit(ray, 0.001, Number.MAX_SAFE_INTEGER);
 
     if (hitRecord) {
-        // Recast reflection with a random deviation
-        const target = add(add(hitRecord.point, hitRecord.normal), normalise(randomVec3InUnitSphere())); // Lambertian diffuse scattering
-        // const target = add(hitRecord.point, randomVec3InHemisphere(hitRecord.normal)); // Hemispherical scattering
-        const bouncedRay = new Ray(hitRecord.point, target);
-        return scale(rayColour(bouncedRay, world, maxBounces - 1), 0.5);
+        const scattered = hitRecord.material.scatter(ray, hitRecord)
+        return multiply(rayColour(scattered, world, maxBounces - 1), hitRecord.material.attenuation);
     }
 
     const normalisedDirection = normalise(ray.direction);

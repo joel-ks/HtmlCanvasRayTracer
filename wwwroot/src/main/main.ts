@@ -23,7 +23,6 @@ onload = function () {
         return;
     }
 
-    // Worker { type: "module" } isn't yet supported in Firefox - https://bugzilla.mozilla.org/show_bug.cgi?id=1247687
     const renderWorker = new Worker("./js/worker/worker.js", { type: "module" });
 
     renderWorker.addEventListener('message', (e: MessageEvent<WorkerUpdate>) => {

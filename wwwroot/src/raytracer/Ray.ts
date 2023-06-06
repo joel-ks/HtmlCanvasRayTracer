@@ -12,11 +12,11 @@ export default class Ray {
     }
 
     get origin() {
-        return Object.freeze(this.#origin);
+        return this.#origin;
     }
 
     get direction() {
-        return Object.freeze(this.#direction);
+        return this.#direction;
     }
 
     at(t: number): Vec3 {

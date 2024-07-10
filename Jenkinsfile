@@ -1,3 +1,4 @@
+//   11665975e26729ac54be68418a5d32354c
 pipeline {
     agent any
     stages {
@@ -17,7 +18,7 @@ pipeline {
                 sh 'mkdir dist'
                 sh 'cp wwwroot/index.html dist/'
                 sh 'cp -R wwwroot/js/ dist/js/'
-                tar file: 'content.tar.gz' dir: 'dist' compress: true archive: true
+                archiveArtifacts artifacts: 'dist/**', onlyIfSuccessful: true
             }
         }
     }

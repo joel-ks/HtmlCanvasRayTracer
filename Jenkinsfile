@@ -5,7 +5,7 @@ pipeline {
             steps {
                 checkout scm
 
-                nodejs(nodeJSInstallationName: 'Node 20.15' {
+                nodejs(nodeJSInstallationName: 'Node 20.15') {
                     sh 'npm clean-install'
                     sh 'npm run build'
                 }

@@ -15,7 +15,7 @@ pipeline {
         stage("Publish") {
             steps {
                 sh 'cp wwwroot/index.html .'
-                sh 'cp wwwroot/js .'
+                sh 'cp -R wwwroot/js .'
                 archiveArtifacts artifacts: 'index.html, js/**', onlyIfSuccessful: true
             }
         }

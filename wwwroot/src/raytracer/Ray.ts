@@ -4,11 +4,9 @@ export default class Ray {
     #origin: Vec3;
     #direction: Vec3;
 
-    constructor();
-    constructor(origin: Vec3, direction: Vec3);
-    constructor(origin?: Vec3, direction?: Vec3) {
-        this.#origin = origin ?? { x: 0, y: 0, z: 0 };
-        this.#direction = direction ?? { x: 0, y: 0, z: 0 };
+    constructor(origin: Vec3, direction: Vec3) {
+        this.#origin = origin;
+        this.#direction = direction;
     }
 
     get origin() {

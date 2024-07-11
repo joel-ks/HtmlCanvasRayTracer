@@ -71,7 +71,7 @@ export class MetalMaterial implements IMaterial {
         const reflected = reflect(normalise(rayIn.direction), hitRecord.normal);
         const perturbation = this.#fuzz === 0 ? { x: 0, y: 0, z: 0 } : scale(randomVec3InUnitSphere(), this.#fuzz);
 
-        return new Ray(hitRecord.point, add(reflected, perturbation)); // TODO: need to handle front/back face?
+        return new Ray(hitRecord.point, add(reflected, perturbation));
     }
 }
 

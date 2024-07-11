@@ -16,7 +16,9 @@ pipeline {
             steps {
                 sh 'cp wwwroot/index.html .'
                 sh 'cp -R wwwroot/js .'
-                archiveArtifacts artifacts: 'index.html, js/**/**.js', onlyIfSuccessful: true
+
+                // This includes the tsconfig.tsbuildinfo incremental build files. TODO: somehow exclude them
+                archiveArtifacts artifacts: 'index.html, js/**', onlyIfSuccessful: true
             }
         }
     }

@@ -15,7 +15,7 @@ pipeline {
         stage("Publish") {
             steps {
                 sh 'cp wwwroot/index.html .'
-                sh 'cp -R wwwroot/js .'
+                sh 'cp -R wwwroot/js/ .'
 
                 // This includes the tsconfig.tsbuildinfo incremental build files. TODO: somehow exclude them
                 archiveArtifacts artifacts: 'index.html, js/**', onlyIfSuccessful: true

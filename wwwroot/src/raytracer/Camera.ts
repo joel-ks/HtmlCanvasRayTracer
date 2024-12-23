@@ -1,5 +1,5 @@
 import Ray from "./Ray";
-import { add, cross, normalise, randomVec3InUnitDisk, scale, subtract, Vec3 } from "./vec3";
+import { type Vec3, add, cross, normalise, randomVec3InUnitDisk, scale, subtract } from "./vec3";
 
 export default class Camera {
     #position: Vec3;

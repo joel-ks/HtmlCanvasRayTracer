@@ -1,6 +1,6 @@
-import { IMaterial } from "./material";
+import type { IMaterial } from "./material";
 import Ray from "./Ray";
-import { dot, scale, subtract, Vec3 } from "./vec3";
+import { type Vec3, dot, scale, subtract } from "./vec3";
 
 export interface HitRecord {
     point: Vec3;

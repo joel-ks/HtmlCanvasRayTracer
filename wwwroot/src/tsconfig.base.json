@@ -4,16 +4,27 @@
         "declarationDir": "../types",
         "rootDir": ".",
         "composite": true,
-
         "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "Node",
         "sourceMap": true,
         "declarationMap": true,
-
-        "strict": true,
+        "lib": ["ESNext"],
+        
+        "module": "ESNext",
+        "moduleResolution": "Bundler", // Modern import resolution rules
+        "moduleDetection": "force", // Every ts file is a module
+        "isolatedModules": true, // Compile modules without reference to other modules (better tooling support)
+        
         "allowJs": true,
         "checkJs": true,
+        "skipLibCheck": true, // Don't type check libraries (will still use library .d.ts files to typecheck our code)
+
+        "strict": true,
+        "exactOptionalPropertyTypes": true,
+        "forceConsistentCasingInFileNames": true,
         "noImplicitAny": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noUncheckedIndexedAccess": true,
+        "verbatimModuleSyntax": true
     }
 }

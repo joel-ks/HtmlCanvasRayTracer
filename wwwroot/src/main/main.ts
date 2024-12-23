@@ -1,12 +1,15 @@
-import { WorkerRequest, WorkerUpdate } from "../worker/workerMessageTypes";
+import type { WorkerRequest, WorkerUpdate } from "../worker/workerMessageTypes";
 
 const canvas = document.getElementById("output") as HTMLCanvasElement;
 const btnRender = document.getElementById("btn-render") as HTMLButtonElement;
 const info = document.getElementById("info") as HTMLSpanElement;
 
 let renderRunning = false;
+start();
 
-onload = function () {
+async function start() {
+    console.log("Starting app...");
+
     if (!isSecureContext) throw new Error("Must be running in a secure context. See https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts");
     if (!crossOriginIsolated) throw new Error("Must be running in a cross-origin isolated context. See https://developer.mozilla.org/en-US/docs/Web/API/crossOriginIsolated");
 

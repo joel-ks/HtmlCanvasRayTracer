@@ -1,7 +1,7 @@
-import { HitRecord } from "./hittable";
+import type { HitRecord } from "./hittable";
 import { rand } from "./numberUtils";
 import Ray from "./Ray";
-import { add, dot, nearZero, normalise, randomVec3InHemisphere, randomVec3InUnitSphere, reflect, refract, scale, Vec3 } from "./vec3";
+import { type Vec3, add, dot, nearZero, normalise, randomVec3InHemisphere, randomVec3InUnitSphere, reflect, refract, scale } from "./vec3";
 
 export interface IMaterial {
     get attenuation(): Vec3;

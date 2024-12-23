@@ -1,10 +1,10 @@
 import Camera from "./Camera";
-import { HittableList, IHittable, Sphere } from "./hittable";
+import { type IHittable, HittableList, Sphere } from "./hittable";
 import ImageStream from "./ImageStream";
-import { DielectricMaterial, IMaterial, LambertianMaterial, MetalMaterial } from "./material";
+import { type IMaterial, DielectricMaterial, LambertianMaterial, MetalMaterial } from "./material";
 import { degreesToRadians, rand } from "./numberUtils";
 import Ray from "./Ray";
-import { add, length, lerp, multiply, normalise, randomVec3, scale, subtract, Vec3 } from "./vec3";
+import { type Vec3, add, length, lerp, multiply, normalise, randomVec3, scale, subtract } from "./vec3";
 
 export function render(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
 

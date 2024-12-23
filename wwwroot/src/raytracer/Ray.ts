@@ -1,4 +1,4 @@
-import { add, scale, Vec3 } from "./vec3";
+import { type Vec3, add, scale } from "./vec3";
 
 export default class Ray {
     #origin: Vec3;

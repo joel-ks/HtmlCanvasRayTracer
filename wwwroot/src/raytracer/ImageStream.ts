@@ -1,5 +1,5 @@
 import { clamp } from "./numberUtils";
-import { Vec3 } from "./vec3";
+import type { Vec3 } from "./vec3";
 
 export default class ImageStream {
     #data: Uint8ClampedArray;

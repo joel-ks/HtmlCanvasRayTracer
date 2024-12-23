@@ -1,10 +1,10 @@
 {
     "extends": "../tsconfig.base.json",
     "compilerOptions": {
-        "lib": ["WebWorker"],
-        "skipLibCheck": true // Because @types/node breaks WW types
+        "lib": ["WebWorker", "ESNext"]
     },
     "references": [
-        { "path": "../raytracer" }
+        { "path": "../raytracer" },
+        { "path": "../raytracer_rust" }
     ]
 }

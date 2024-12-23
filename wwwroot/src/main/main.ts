@@ -46,6 +46,7 @@ async function start() {
 
             const width = canvas.width, height = canvas.height;
             const request: WorkerRequest = {
+                renderer: "wasm",
                 width,
                 height,
                 data: new SharedArrayBuffer(width * height * 4)

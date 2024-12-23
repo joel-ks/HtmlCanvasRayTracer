@@ -1,6 +1,13 @@
 # Build artifacts
 dist/
 
+/rust/pkg/
+/rust/target/
+Cargo.lock
+
+/wwwroot/js/
+/wwwroot/types/
+
 ### Linux ###
 *~
 

@@ -35,21 +35,13 @@ impl Renderer {
         let focal_length = 1.0;
         let camera_centre = Point3::origin();
 
-        let viewport_u = Vec3 {
-            x: viewport_width,
-            y: 0.0,
-            z: 0.0,
-        };
-        let viewport_v = Vec3 {
-            x: 0.0,
-            y: -viewport_height,
-            z: 0.0,
-        };
+        let viewport_u = Vec3 { x: viewport_width, y: 0.0, z: 0.0 };
+        let viewport_v = Vec3 { x: 0.0, y: -viewport_height, z: 0.0 };
 
         let pixel_delta_u = viewport_u / (width as f64);
         let pixel_delta_v = viewport_v / (height as f64);
 
-        let viewport_upper_left = camera_centre - Vec3 { x: 0.0, y: 0.0, z: focal_length };
+        let viewport_upper_left = camera_centre - Vec3 { x: 0.0, y: 0.0, z: focal_length } - viewport_u/2.0 - viewport_v/2.0;
         let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
         return Renderer {
@@ -79,8 +71,30 @@ impl Renderer {
         Pixel::from_colour(colour)
     }
 
+    fn hit_sphere(r: Ray, centre: Point3, radius: f64) -> bool {
+        // Equation for ray(O,D) intersects sphere(C,r):
+        // => t^2*(D⋅D)+2*t*(D⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
+        // Solve for t to determine if ray intersects at any point:
+        // => Quadratic formula: (-b +- sqrt(b^2 - 4*a*c)) / 2*a where
+        //      - a = (D⋅D)
+        //      - b = 2*(D⋅(O-C))
+        //      - c = ((O-C)⋅(O-C))−r^2
+        // Hit sphere when there is a solution
+        // => i.e. when discriminant (b^2 - 4*a*c) is non-zero
+        let oc = centre - r.origin;
+        let a = Vec3::dot(r.direction, r.direction);
+        let b = -2.0 * Vec3::dot(r.direction, oc);
+        let c = Vec3::dot(oc, oc) - radius * radius;
+        let discriminant = b*b - 4.0*a*c;
+        discriminant >= 0.0
+    }
+
     fn ray_colour(r: Ray) -> Colour {
-        let start_colour = Colour { x: 1.0, y:1.0, z: 1.0 };
+        if Renderer::hit_sphere(r, Point3 { x: 0.0, y: 0.0, z: -1.0 }, 0.5) {
+            return Colour { x: 1.0, y: 0.0, z: 0.0 };
+        }
+
+        let start_colour = Colour { x: 1.0, y: 1.0, z: 1.0 };
         let end_colour = Colour { x: 0.5, y: 0.7, z: 1.0 };
 
         let dir_norm = r.direction.normalize();

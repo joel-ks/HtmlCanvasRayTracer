@@ -19,8 +19,8 @@ export default class Raytracer {
 
         const output = new Uint8ClampedArray(sab);
         let i = -1;
-        for (let y = this.#height-1; y >= 0; --y) {
-            statusUpdate(`Progress: ${Math.floor(((this.#height - 1 - y) / this.#height) * 100)}%`);
+        for (let y = 0; y < this.#height; ++y) {
+            statusUpdate(`Progress: ${Math.floor((y / this.#height) * 100)}%`);
 
             for (let x = 0; x < this.#width; ++x) {
                 const p = this.#wasmRaytracer.render_pixel(x, y);

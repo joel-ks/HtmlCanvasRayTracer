@@ -13,25 +13,25 @@ pub struct Pixel {
 
 impl Pixel {
     pub fn from_f32s(r: f32, g: f32, b: f32, a: f32) -> Pixel {
-        const SCALE: f32 = 255.0;
+        const MAX_U8: f32 = 255.0;
         
-        return Pixel {
-            r: (r * SCALE).floor() as u8,
-            g: (g * SCALE).floor() as u8,
-            b: (b * SCALE).floor() as u8,
-            a: (a * SCALE).floor() as u8,
-        };
+        Pixel {
+            r: (r * MAX_U8).floor() as u8,
+            g: (g * MAX_U8).floor() as u8,
+            b: (b * MAX_U8).floor() as u8,
+            a: (a * MAX_U8).floor() as u8,
+        }
     }
 
     pub fn from_f64s(r: f64, g: f64, b: f64, a: f64) -> Pixel {
-        const SCALE: f64 = 255.0;
+        const MAX_U8: f64 = 255.0;
         
-        return Pixel {
-            r: (r * SCALE).floor() as u8,
-            g: (g * SCALE).floor() as u8,
-            b: (b * SCALE).floor() as u8,
-            a: (a * SCALE).floor() as u8,
-        };
+        Pixel {
+            r: (r * MAX_U8).floor() as u8,
+            g: (g * MAX_U8).floor() as u8,
+            b: (b * MAX_U8).floor() as u8,
+            a: (a * MAX_U8).floor() as u8,
+        }
     }
 
     pub fn from_colour(colour: Colour) -> Pixel {

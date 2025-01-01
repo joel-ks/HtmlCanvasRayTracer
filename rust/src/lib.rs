@@ -1,9 +1,14 @@
 mod colour;
+mod hittable;
+mod interval;
 mod ray;
 mod utils;
 mod vec3;
+mod wasm_utils;
 
 use colour::{Colour, Pixel};
+use hittable::{Hittable, HittableList, Sphere};
+use interval::Interval;
 use ray::Ray;
 use vec3::{Point3, Vec3};
 use wasm_bindgen::prelude::*;
@@ -12,22 +17,23 @@ use wasm_bindgen::prelude::*;
 pub struct Renderer {
     image_width: u32,
     image_height: u32,
-    
+
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
 
     viewport_width: f64,
     viewport_height: f64,
-
     focal_length: f64,
     camera_centre: Point3,
+
+    world: HittableList,
 }
 
 #[wasm_bindgen]
 impl Renderer {
     pub fn new(width: u32, height: u32) -> Renderer {
-        utils::set_panic_hook();
+        wasm_utils::set_panic_hook();
 
         let aspect_ratio = width as f64 / height as f64;
         let viewport_height = 2.0;
@@ -41,7 +47,8 @@ impl Renderer {
         let pixel_delta_u = viewport_u / (width as f64);
         let pixel_delta_v = viewport_v / (height as f64);
 
-        let viewport_upper_left = camera_centre - Vec3 { x: 0.0, y: 0.0, z: focal_length } - viewport_u/2.0 - viewport_v/2.0;
+        let viewport_upper_left = camera_centre - Vec3 { x: 0.0, y: 0.0, z: focal_length }
+            - viewport_u / 2.0 - viewport_v / 2.0;
         let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
         return Renderer {
@@ -54,44 +61,39 @@ impl Renderer {
             viewport_height,
             focal_length,
             camera_centre,
+            world: Renderer::generate_world(),
         };
+    }
+
+    fn generate_world() -> HittableList {
+        let mut world = HittableList::new();
+
+        world.add(Box::new(Sphere::new(Point3 { x: 0.0, y: 0.0, z: -1.0 }, 0.5)));
+        world.add(Box::new(Sphere::new(Point3 { x: 0.0, y: -100.5, z: -1.0 }, 100.0)));
+
+        return world;
     }
 
     pub fn render_pixel(&self, x: u32, y: u32) -> Pixel {
-        let pixel_centre = self.pixel00_loc +
-            ((x as f64) * self.pixel_delta_u) +
-            ((y as f64) * self.pixel_delta_v);
+        let pixel_centre = self.pixel00_loc + ((x as f64) * self.pixel_delta_u) + ((y as f64) * self.pixel_delta_v);
         let ray_direction = pixel_centre - self.camera_centre;
         let ray = Ray {
             origin: self.camera_centre,
-            direction: ray_direction
+            direction: ray_direction,
         };
-        let colour = Renderer::ray_colour(ray);
-        
-        Pixel::from_colour(colour)
+        let colour = self.ray_colour(ray);
+
+        return Pixel::from_colour(colour);
     }
 
-    fn hit_sphere(r: Ray, centre: Point3, radius: f64) -> bool {
-        // Equation for ray(O,D) intersects sphere(C,r):
-        // => t^2*(D⋅D)+2*t*(D⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
-        // Solve for t to determine if ray intersects at any point:
-        // => Quadratic formula: (-b +- sqrt(b^2 - 4*a*c)) / 2*a where
-        //      - a = (D⋅D)
-        //      - b = 2*(D⋅(O-C))
-        //      - c = ((O-C)⋅(O-C))−r^2
-        // Hit sphere when there is a solution
-        // => i.e. when discriminant (b^2 - 4*a*c) is non-zero
-        let oc = centre - r.origin;
-        let a = Vec3::dot(r.direction, r.direction);
-        let b = -2.0 * Vec3::dot(r.direction, oc);
-        let c = Vec3::dot(oc, oc) - radius * radius;
-        let discriminant = b*b - 4.0*a*c;
-        discriminant >= 0.0
-    }
-
-    fn ray_colour(r: Ray) -> Colour {
-        if Renderer::hit_sphere(r, Point3 { x: 0.0, y: 0.0, z: -1.0 }, 0.5) {
-            return Colour { x: 1.0, y: 0.0, z: 0.0 };
+    fn ray_colour(&self, r: Ray) -> Colour {
+        let hit_record = self.world.hit(r, Interval { min: 0.0, max: utils::INFINITY });
+        if let Some(hit_record) = hit_record {
+            return Colour {
+                x: (hit_record.normal.x + 1.0) * 0.5,
+                y: (hit_record.normal.y + 1.0) * 0.5,
+                z: (hit_record.normal.z + 1.0) * 0.5,
+            };
         }
 
         let start_colour = Colour { x: 1.0, y: 1.0, z: 1.0 };
@@ -100,6 +102,6 @@ impl Renderer {
         let dir_norm = r.direction.normalize();
         let a = 0.5 * (dir_norm.y + 1.0);
 
-        (1.0 - a) * start_colour + a * end_colour
+        return (1.0 - a) * start_colour + a * end_colour;
     }
 }

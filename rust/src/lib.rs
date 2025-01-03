@@ -36,7 +36,7 @@ impl Renderer {
             up: Vec3 { x: 0.0, y: 1.0, z: 0.0 },
             defocus_angle: 0.6,
             focal_length: 10.0,
-            samples: 500,
+            samples: 100,
             max_bounces: 50
         }.build();
         let world = Renderer::generate_world();

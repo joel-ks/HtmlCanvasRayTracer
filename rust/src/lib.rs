@@ -16,7 +16,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct Renderer {
     camera: Camera,
-    world: Box<dyn Hittable>,
+    world: HittableList,
 }
 
 #[wasm_bindgen]
@@ -25,7 +25,7 @@ impl Renderer {
         wasm_utils::set_panic_hook();
 
         let camera = Camera::new(width, height);
-        let world = Box::new(Renderer::generate_world());
+        let world = Renderer::generate_world();
 
         Renderer { camera, world }
     }
@@ -37,8 +37,8 @@ impl Renderer {
     fn generate_world() -> HittableList {
         let mut world = HittableList::new();
 
-        world.add(Box::new(Sphere::new(Point3 { x: 0.0, y: 0.0, z: -1.0 }, 0.5)));
-        world.add(Box::new(Sphere::new(Point3 { x: 0.0, y: -100.5, z: -1.0 }, 100.0)));
+        world.add(Sphere::new(Point3 { x: 0.0, y: 0.0, z: -1.0 }, 0.5));
+        world.add(Sphere::new(Point3 { x: 0.0, y: -100.5, z: -1.0 }, 100.0));
 
         return world;
     }

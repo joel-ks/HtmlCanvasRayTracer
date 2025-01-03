@@ -13,8 +13,8 @@ impl HittableList {
         }
     }
 
-    pub fn add(&mut self, hittable: Box<dyn Hittable>) {
-        self.hittables.push(hittable);
+    pub fn add(&mut self, hittable: impl Hittable + 'static) {
+        self.hittables.push(Box::new(hittable));
     }
 }
 

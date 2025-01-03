@@ -41,7 +41,7 @@ impl Camera {
         }
     }
 
-    pub fn render_pixel(&self, x: u32, y: u32, world: &Box<dyn Hittable>) -> Pixel {
+    pub fn render_pixel(&self, x: u32, y: u32, world: &impl Hittable) -> Pixel {
         let pixel_centre = self.pixel00_loc + ((x as f64) * self.pixel_delta_u) + ((y as f64) * self.pixel_delta_v);
         let ray_direction = pixel_centre - self.centre;
         let ray = Ray {
@@ -53,7 +53,7 @@ impl Camera {
         return Pixel::from_colour(colour);
     }
 
-    fn ray_colour(ray: Ray, world: &Box<dyn Hittable>) -> Colour {
+    fn ray_colour(ray: Ray, world: &impl Hittable) -> Colour {
         let hit_record = world.hit(
             ray,
             Interval {

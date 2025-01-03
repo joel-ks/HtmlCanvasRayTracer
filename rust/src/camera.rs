@@ -1,3 +1,5 @@
+use web_sys::js_sys::Math::random;
+
 use crate::{
     colour::{Colour, Pixel},
     hittable::Hittable,
@@ -12,10 +14,12 @@ pub struct Camera {
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
+    samples: u32,
+    pixel_samples_scale: f64
 }
 
 impl Camera {
-    pub fn new(image_width: u32, image_height: u32) -> Camera {
+    pub fn new(image_width: u32, image_height: u32, samples: u32) -> Camera {
         let aspect_ratio = image_width as f64 / image_height as f64;
         let centre = Point3::origin();
 
@@ -33,24 +37,51 @@ impl Camera {
             - viewport_u / 2.0 - viewport_v / 2.0;
         let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
+        let pixel_samples_scale = 1.0 / (samples as f64);
+
         Camera {
             centre,
             pixel00_loc,
             pixel_delta_u,
-            pixel_delta_v
+            pixel_delta_v,
+            samples,
+            pixel_samples_scale
         }
     }
 
     pub fn render_pixel(&self, x: u32, y: u32, world: &impl Hittable) -> Pixel {
-        let pixel_centre = self.pixel00_loc + ((x as f64) * self.pixel_delta_u) + ((y as f64) * self.pixel_delta_v);
-        let ray_direction = pixel_centre - self.centre;
-        let ray = Ray {
-            origin: self.centre,
-            direction: ray_direction,
-        };
-        let colour = Camera::ray_colour(ray, world);
+        let mut colour = Colour { x: 0.0, y: 0.0, z: 0.0 };
+        
+        for _ in 0..self.samples {
+            let ray = self.get_ray(x, y);
+            colour += Camera::ray_colour(ray, world);
+        }
 
-        return Pixel::from_colour(colour);
+        return Pixel::from_colour(self.pixel_samples_scale * colour);
+    }
+
+    fn get_ray(&self, x: u32, y: u32) -> Ray {
+        // Construct a camera ray originating from the origin and directed at randomly sampled
+        // point around the pixel location x, y.
+        let offset = Camera::sample_square();
+        let pixel_sample = self.pixel00_loc
+            + ((x as f64 + offset.x) * self.pixel_delta_u)
+            + ((y as f64 + offset.y) * self.pixel_delta_v);
+        
+        Ray {
+            origin: self.centre,
+            direction: pixel_sample - self.centre
+        }
+    }
+
+    /// Returns the vector to a random point in the \[-.5,-.5\]-\[+.5,+.5\] unit square.
+    fn sample_square() -> Vec3 {
+        return Vec3
+        {
+            x: random() - 0.5,
+            y: random() - 0.5,
+            z: 0.0
+        }
     }
 
     fn ray_colour(ray: Ray, world: &impl Hittable) -> Colour {

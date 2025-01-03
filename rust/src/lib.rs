@@ -9,7 +9,7 @@ mod wasm_utils;
 
 use camera::Camera;
 use colour::Pixel;
-use hittable::{Hittable, HittableList, Sphere};
+use hittable::{HittableList, Sphere};
 use vec3::Point3;
 use wasm_bindgen::prelude::*;
 
@@ -24,7 +24,7 @@ impl Renderer {
     pub fn new(width: u32, height: u32) -> Renderer {
         wasm_utils::set_panic_hook();
 
-        let camera = Camera::new(width, height);
+        let camera = Camera::new(width, height, 100);
         let world = Renderer::generate_world();
 
         Renderer { camera, world }

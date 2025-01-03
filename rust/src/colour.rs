@@ -1,4 +1,4 @@
-use crate::vec3::Vec3;
+use crate::{interval::Interval, vec3::Vec3};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 pub type Colour = Vec3;
@@ -12,25 +12,18 @@ pub struct Pixel {
 }
 
 impl Pixel {
-    pub fn from_f32s(r: f32, g: f32, b: f32, a: f32) -> Pixel {
-        const MAX_U8: f32 = 255.0;
-        
-        Pixel {
-            r: (r * MAX_U8).floor() as u8,
-            g: (g * MAX_U8).floor() as u8,
-            b: (b * MAX_U8).floor() as u8,
-            a: (a * MAX_U8).floor() as u8,
-        }
-    }
-
     pub fn from_f64s(r: f64, g: f64, b: f64, a: f64) -> Pixel {
         const MAX_U8: f64 = 255.0;
+        static INTENSITY: Interval = Interval {
+            min: 0.0,
+            max: 1.0 - f64::EPSILON
+        };
         
         Pixel {
-            r: (r * MAX_U8).floor() as u8,
-            g: (g * MAX_U8).floor() as u8,
-            b: (b * MAX_U8).floor() as u8,
-            a: (a * MAX_U8).floor() as u8,
+            r: (INTENSITY.clamp(r) * MAX_U8).floor() as u8,
+            g: (INTENSITY.clamp(g) * MAX_U8).floor() as u8,
+            b: (INTENSITY.clamp(b) * MAX_U8).floor() as u8,
+            a: (INTENSITY.clamp(a) * MAX_U8).floor() as u8,
         }
     }
 

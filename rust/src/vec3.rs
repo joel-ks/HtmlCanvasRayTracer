@@ -86,6 +86,14 @@ impl Vec3 {
         self - 2.0 * Vec3::dot(self, normal) * normal
     }
 
+    pub fn refract(self, normal: Vec3, refraction_index: f64) -> Vec3 {
+        let cos_theta = Vec3::dot(-self, normal).min(1.0);
+        let r_out_perp = refraction_index * (self + cos_theta * normal);
+        let r_out_para = -((1.0 - r_out_perp.length_squared()).abs().sqrt()) * normal;
+
+        r_out_perp + r_out_para
+    }
+
     pub fn dot(lhs: Vec3, rhs: Vec3) -> f64 {
         lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z
     }

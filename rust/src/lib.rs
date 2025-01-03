@@ -11,7 +11,7 @@ mod wasm_utils;
 use camera::Camera;
 use colour::Pixel;
 use hittable::{HittableList, Sphere};
-use material::{Lambertian, Metal};
+use material::{Dielectric, Lambertian, Metal};
 use vec3::{Point3, Vec3};
 use wasm_bindgen::prelude::*;
 
@@ -51,10 +51,14 @@ impl Renderer {
             Lambertian::new(Vec3 { x: 0.1, y: 0.2, z: 0.5 })
         ));
 
-        // Left
+        // Left (hollow glass sphere modeled as a glass sphere and a bubble that's fully inside)
         world.add(Sphere::new(
             Point3 { x: -1.0, y: 0.0, z: -1.0 }, 0.5,
-            Metal::new(Vec3 { x: 0.8, y: 0.8, z: 0.8 }, 0.3)
+            Dielectric::new(1.5)
+        ));
+        world.add(Sphere::new(
+            Point3 { x: -1.0, y: 0.0, z: -1.0 }, 0.4,
+            Dielectric::new(1.0 / 1.5)
         ));
 
         // Right

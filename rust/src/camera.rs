@@ -7,6 +7,58 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
+pub struct CameraBuilder {
+    pub image_width: u32,
+    pub image_height: u32,
+    pub v_fov_degrees: f64,
+    pub look_from: Point3,
+    pub look_at: Point3,
+    pub up: Vec3,
+    pub samples: u32,
+    pub max_bounces: u32
+}
+
+impl CameraBuilder {
+    pub fn build(self) -> Camera {
+        let aspect_ratio = self.image_width as f64 / self.image_height as f64;
+
+        // Determine viewport dimensions.
+        let focal_length = (self.look_from - self.look_at).length();
+        let v_fov_rads = utils::degs_to_rads(self.v_fov_degrees);
+        let viewport_height = 2.0 * (v_fov_rads / 2.0).tan() * focal_length;
+        let viewport_width = viewport_height * aspect_ratio;
+
+        // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+        let w = (self.look_from - self.look_at).normalize();
+        let u = Vec3::cross(self.up, w).normalize();
+        let v = Vec3::cross(w, u);
+
+        // Calculate the vectors across the horizontal and down the vertical viewport edges.
+        let viewport_u = viewport_width * u; // Vector across viewport horizontal edge
+        let viewport_v = viewport_height * -v; // Vector down viewport vertical edge
+    
+        // Calculate the horizontal and vertical delta vectors from pixel to pixel.
+        let pixel_delta_u = viewport_u / (self.image_width as f64);
+        let pixel_delta_v = viewport_v / (self.image_height as f64);
+
+        // Calculate the location of the upper left pixel.
+        let viewport_upper_left = self.look_from - focal_length * w - viewport_u / 2.0 - viewport_v / 2.0;
+        let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+
+        let pixel_samples_scale = 1.0 / (self.samples as f64);
+
+        Camera {
+            centre: self.look_from,
+            pixel00_loc,
+            pixel_delta_u,
+            pixel_delta_v,
+            samples: self.samples,
+            max_bounces: self.max_bounces,
+            pixel_samples_scale
+        }
+    }
+}
+
 pub struct Camera {
     centre: Point3,
     pixel00_loc: Point3,
@@ -18,37 +70,6 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(image_width: u32, image_height: u32, samples: u32, max_bounces: u32) -> Camera {
-        let aspect_ratio = image_width as f64 / image_height as f64;
-        let centre = Point3::origin();
-
-        let viewport_height = 2.0;
-        let viewport_width = viewport_height * aspect_ratio;
-        let focal_length = 1.0;
-
-        let viewport_u = Vec3 { x: viewport_width, y: 0.0, z: 0.0 };
-        let viewport_v = Vec3 { x: 0.0, y: -viewport_height, z: 0.0 };
- 
-        let pixel_delta_u = viewport_u / (image_width as f64);
-        let pixel_delta_v = viewport_v / (image_height as f64);
-
-        let viewport_upper_left = centre - Vec3 { x: 0.0, y: 0.0, z: focal_length }
-            - viewport_u / 2.0 - viewport_v / 2.0;
-        let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
-
-        let pixel_samples_scale = 1.0 / (samples as f64);
-
-        Camera {
-            centre,
-            pixel00_loc,
-            pixel_delta_u,
-            pixel_delta_v,
-            samples,
-            max_bounces,
-            pixel_samples_scale
-        }
-    }
-
     pub fn render_pixel(&self, x: u32, y: u32, world: &impl Hittable) -> Pixel {
         let mut colour = Colour { x: 0.0, y: 0.0, z: 0.0 };
         

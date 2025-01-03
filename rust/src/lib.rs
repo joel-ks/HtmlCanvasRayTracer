@@ -9,11 +9,12 @@ mod vec3;
 mod wasm_utils;
 
 use camera::{Camera, CameraBuilder};
-use colour::Pixel;
+use colour::{Colour, Pixel};
 use hittable::{HittableList, Sphere};
 use material::{Dielectric, Lambertian, Metal};
 use vec3::{Point3, Vec3};
 use wasm_bindgen::prelude::*;
+use web_sys::js_sys::Math::random;
 
 #[wasm_bindgen]
 pub struct Renderer {
@@ -30,12 +31,12 @@ impl Renderer {
             image_width: width,
             image_height: height,
             v_fov_degrees: 20.0,
-            look_from: Point3 { x: -2.0, y: 2.0, z: 1.0 },
-            look_at: Point3 { x: 0.0, y: 0.0, z: -1.0 },
+            look_from: Point3 { x: 13.0, y: 2.0, z: 3.0 },
+            look_at: Point3 { x: 0.0, y: 0.0, z: 0.0 },
             up: Vec3 { x: 0.0, y: 1.0, z: 0.0 },
-            defocus_angle: 10.0,
-            focal_length: 3.4,
-            samples: 100,
+            defocus_angle: 0.6,
+            focal_length: 10.0,
+            samples: 500,
             max_bounces: 50
         }.build();
         let world = Renderer::generate_world();
@@ -52,30 +53,51 @@ impl Renderer {
 
         // Ground
         world.add(Sphere::new(
-            Point3 { x: 0.0, y: -100.5, z: -1.0 }, 100.0,
-            Lambertian::new(Vec3 { x: 0.8, y: 0.8, z: 0.0 })
+            Point3 { x: 0.0, y: -1000.0, z: 0.0 }, 1000.0,
+            Lambertian::new(Vec3 { x: 0.5, y: 0.5, z: 0.5 })
         ));
 
-        // Centre
-        world.add(Sphere::new(
-            Point3 { x: 0.0, y: 0.0, z: -1.2 }, 0.5,
-            Lambertian::new(Vec3 { x: 0.1, y: 0.2, z: 0.5 })
-        ));
+        // Lots of random small spheres
+        for a in -11..11 {
+            for b in -11..11 {
+                let centre = Point3 {
+                    x: a as f64 + 0.9 * utils::random(),
+                    y: 0.2,
+                    z: b as f64 + 0.9 * random()
+                };
 
-        // Left (hollow glass sphere modeled as a glass sphere and a bubble that's fully inside)
+                static FRONT_OF_SCENE: Point3 = Point3 { x: 4.0, y: 0.2, z: 0.0 };
+                if (centre - FRONT_OF_SCENE).length() > 0.9 {
+                    let choose_mat = utils::random();
+
+                    if choose_mat < 0.8 {
+                        let material = Lambertian::new(Colour::random() * Colour::random());
+                        world.add(Sphere::new(centre, 0.2, material));
+                    } else if choose_mat < 0.95 {
+                        let material = Metal::new(Colour::range_random(0.5, 1.0), utils::range_random(0.0, 0.5));
+                        world.add(Sphere::new(centre, 0.2, material));
+                    } else {
+                        let material = Dielectric::new(1.5);
+                        world.add(Sphere::new(centre, 0.2, material));
+                    };
+                }
+            }
+        }
+
+        // 3 central spheres
         world.add(Sphere::new(
-            Point3 { x: -1.0, y: 0.0, z: -1.0 }, 0.5,
+            Point3 { x: 0.0, y: 1.0, z: 0.0 }, 1.0,
             Dielectric::new(1.5)
         ));
+
         world.add(Sphere::new(
-            Point3 { x: -1.0, y: 0.0, z: -1.0 }, 0.4,
-            Dielectric::new(1.0 / 1.5)
+            Point3 { x: -4.0, y: 1.0, z: 0.0 }, 1.0,
+            Lambertian::new(Vec3 { x: 0.4, y: 0.2, z: 0.1 })
         ));
 
-        // Right
         world.add(Sphere::new(
-            Point3 { x: 1.0, y: 0.0, z: -1.0 }, 0.5,
-            Metal::new(Vec3 { x: 0.8, y: 0.6, z: 0.2 }, 1.0)
+            Point3 { x: 4.0, y: 1.0, z: 0.0 }, 1.0,
+            Metal::new(Vec3 { x: 0.7, y: 0.6, z: 0.5 }, 0.0)
         ));
 
         return world;

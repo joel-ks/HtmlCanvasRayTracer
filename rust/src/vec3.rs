@@ -3,6 +3,8 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
+use crate::utils;
+
 #[derive(Clone, Copy)] // TODO: add Format?
 pub struct Vec3 {
     pub x: f64,
@@ -18,6 +20,47 @@ impl Vec3 {
             x: 0.0,
             y: 0.0,
             z: 0.0,
+        }
+    }
+
+    pub fn random() -> Vec3 {
+        Vec3 {
+            x: utils::random(),
+            y: utils::random(),
+            z: utils::random(),
+        }
+    }
+
+    pub fn range_random(min: f64, max: f64) -> Vec3 {
+        Vec3 {
+            x: utils::range_random(min, max),
+            y: utils::range_random(min, max),
+            z: utils::range_random(min, max),
+        }
+    }
+
+    pub fn random_unit_vector() -> Vec3 {
+        loop {
+            let v = Vec3::random();
+            let length_squared = v.length_squared();
+
+            if length_squared == 1.0 {
+                return v;
+            }
+            else if length_squared > f64::MIN_POSITIVE && length_squared < 1.0 {
+                return v / length_squared.sqrt();
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
+        let on_unit_sphere = Vec3::random_unit_vector();
+
+        if Vec3::dot(on_unit_sphere, normal) > 0.0 {
+            // In the same hemisphere as normal
+            on_unit_sphere
+        } else {
+            -on_unit_sphere
         }
     }
 

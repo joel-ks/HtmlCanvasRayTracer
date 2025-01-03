@@ -1,5 +1,3 @@
-use web_sys::js_sys::Math::random;
-
 use crate::{
     colour::{Colour, Pixel},
     hittable::Hittable,
@@ -15,11 +13,12 @@ pub struct Camera {
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
     samples: u32,
+    max_bounces: u32,
     pixel_samples_scale: f64
 }
 
 impl Camera {
-    pub fn new(image_width: u32, image_height: u32, samples: u32) -> Camera {
+    pub fn new(image_width: u32, image_height: u32, samples: u32, max_bounces: u32) -> Camera {
         let aspect_ratio = image_width as f64 / image_height as f64;
         let centre = Point3::origin();
 
@@ -45,6 +44,7 @@ impl Camera {
             pixel_delta_u,
             pixel_delta_v,
             samples,
+            max_bounces,
             pixel_samples_scale
         }
     }
@@ -54,7 +54,7 @@ impl Camera {
         
         for _ in 0..self.samples {
             let ray = self.get_ray(x, y);
-            colour += Camera::ray_colour(ray, world);
+            colour += Camera::ray_colour(ray, world, self.max_bounces);
         }
 
         return Pixel::from_colour(self.pixel_samples_scale * colour);
@@ -78,26 +78,32 @@ impl Camera {
     fn sample_square() -> Vec3 {
         return Vec3
         {
-            x: random() - 0.5,
-            y: random() - 0.5,
+            x: utils::random() - 0.5,
+            y: utils::random() - 0.5,
             z: 0.0
         }
     }
 
-    fn ray_colour(ray: Ray, world: &impl Hittable) -> Colour {
+    fn ray_colour(ray: Ray, world: &impl Hittable, bounce_limit: u32) -> Colour {
+        if bounce_limit <= 0 {
+            return Colour::origin();
+        }
+
         let hit_record = world.hit(
             ray,
             Interval {
-                min: 0.0,
+                min: 0.001,
                 max: utils::INFINITY,
             },
         );
+
+        // Trace ray off the object that was hit
         if let Some(hit_record) = hit_record {
-            return Colour {
-                x: (hit_record.normal.x + 1.0) * 0.5,
-                y: (hit_record.normal.y + 1.0) * 0.5,
-                z: (hit_record.normal.z + 1.0) * 0.5,
-            };
+            // let direction = Vec3::random_on_hemisphere(hit_record.normal); // hemispheric distribution
+            let direction = hit_record.normal + Vec3::random_unit_vector(); // Lambertian distribution
+            let ray = Ray { origin: hit_record.p, direction };
+
+            return 0.5 * Camera::ray_colour(ray, world, bounce_limit - 1);
         }
 
         static START_COLOUR: Colour = Colour {

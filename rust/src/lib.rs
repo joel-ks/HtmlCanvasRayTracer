@@ -24,7 +24,7 @@ impl Renderer {
     pub fn new(width: u32, height: u32) -> Renderer {
         wasm_utils::set_panic_hook();
 
-        let camera = Camera::new(width, height, 100);
+        let camera = Camera::new(width, height, 100, 50);
         let world = Renderer::generate_world();
 
         Renderer { camera, world }

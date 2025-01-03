@@ -2,6 +2,7 @@ mod camera;
 mod colour;
 mod hittable;
 mod interval;
+mod material;
 mod ray;
 mod utils;
 mod vec3;
@@ -10,7 +11,8 @@ mod wasm_utils;
 use camera::Camera;
 use colour::Pixel;
 use hittable::{HittableList, Sphere};
-use vec3::Point3;
+use material::{Lambertian, Metal};
+use vec3::{Point3, Vec3};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -37,8 +39,29 @@ impl Renderer {
     fn generate_world() -> HittableList {
         let mut world = HittableList::new();
 
-        world.add(Sphere::new(Point3 { x: 0.0, y: 0.0, z: -1.0 }, 0.5));
-        world.add(Sphere::new(Point3 { x: 0.0, y: -100.5, z: -1.0 }, 100.0));
+        // Ground
+        world.add(Sphere::new(
+            Point3 { x: 0.0, y: -100.5, z: -1.0 }, 100.0,
+            Lambertian::new(Vec3 { x: 0.8, y: 0.8, z: 0.0 })
+        ));
+
+        // Centre
+        world.add(Sphere::new(
+            Point3 { x: 0.0, y: 0.0, z: -1.2 }, 0.5,
+            Lambertian::new(Vec3 { x: 0.1, y: 0.2, z: 0.5 })
+        ));
+
+        // Left
+        world.add(Sphere::new(
+            Point3 { x: -1.0, y: 0.0, z: -1.0 }, 0.5,
+            Metal::new(Vec3 { x: 0.8, y: 0.8, z: 0.8 }, 0.3)
+        ));
+
+        // Right
+        world.add(Sphere::new(
+            Point3 { x: 1.0, y: 0.0, z: -1.0 }, 0.5,
+            Metal::new(Vec3 { x: 0.8, y: 0.6, z: 0.2 }, 1.0)
+        ));
 
         return world;
     }

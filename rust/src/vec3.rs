@@ -76,6 +76,16 @@ impl Vec3 {
         self / self.length()
     }
 
+    pub fn near_zero(self) -> bool {
+        const S: f64 = 1e-8;
+
+        self.x.abs() < S && self.y.abs() < S && self.z.abs() < S
+    }
+
+    pub fn reflect(self, normal: Vec3) -> Vec3 {
+        self - 2.0 * Vec3::dot(self, normal) * normal
+    }
+
     pub fn dot(lhs: Vec3, rhs: Vec3) -> f64 {
         lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z
     }

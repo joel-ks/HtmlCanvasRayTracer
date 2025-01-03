@@ -99,11 +99,11 @@ impl Camera {
 
         // Trace ray off the object that was hit
         if let Some(hit_record) = hit_record {
-            // let direction = Vec3::random_on_hemisphere(hit_record.normal); // hemispheric distribution
-            let direction = hit_record.normal + Vec3::random_unit_vector(); // Lambertian distribution
-            let ray = Ray { origin: hit_record.p, direction };
-
-            return 0.5 * Camera::ray_colour(ray, world, bounce_limit - 1);
+            if let Some(scatter) = hit_record.material.scatter(&ray, &hit_record) {
+                return scatter.attenuation * Camera::ray_colour(scatter.scattered, world, bounce_limit - 1);
+            } else {
+                return Colour::origin();
+            }
         }
 
         static START_COLOUR: Colour = Colour {

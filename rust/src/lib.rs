@@ -33,6 +33,8 @@ impl Renderer {
             look_from: Point3 { x: -2.0, y: 2.0, z: 1.0 },
             look_at: Point3 { x: 0.0, y: 0.0, z: -1.0 },
             up: Vec3 { x: 0.0, y: 1.0, z: 0.0 },
+            defocus_angle: 10.0,
+            focal_length: 3.4,
             samples: 100,
             max_bounces: 50
         }.build();

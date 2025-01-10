@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{interval::Interval, material::Material, vec3::{Point3, Vec3}};
+use crate::{interval::Interval, material::Material, ray::Ray, vec3::{Point3, Vec3}};
 
 use super::{HitRecord, Hittable};
 
@@ -23,7 +23,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: crate::ray::Ray, ray_t: Interval) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<HitRecord> {
         // Equation for ray(O,D) intersects sphere(C,r):
         // => t^2(D⋅D)-2t(D⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
         // Solve for t to determine if ray intersects at any point:
@@ -33,9 +33,9 @@ impl Hittable for Sphere {
         //      - c = ((O-C)⋅(O-C))−r^2
         // Since b has a factor of -2 we can simplify by setting h = b/-2 = D⋅(O-C)
         // => Formula simplifies to: (h ± sqrt(h^2 - ac)) / a
-        let oc = self.centre - r.origin; // precalculate as this is part of h and c
-        let a = r.direction.length_squared();
-        let h = Vec3::dot(r.direction, oc);
+        let oc = self.centre - ray.origin; // precalculate as this is part of h and c
+        let a = ray.direction.length_squared();
+        let h = Vec3::dot(ray.direction, oc);
         let c = Vec3::dot(oc, oc) - self.radius * self.radius;
 
         // Hit sphere when there is a solution
@@ -49,15 +49,15 @@ impl Hittable for Sphere {
 
         // Find the nearest root that lies in the acceptable range.
         let mut root = (h - sqrt_discriminant) / a;
-        if !ray_t.surrounds(root) {
+        if !ray_test_interval.surrounds(root) {
             root = (h + sqrt_discriminant) / a;
-            if !ray_t.surrounds(root) {
+            if !ray_test_interval.surrounds(root) {
                 return None;
             }
         }
 
-        let p = r.at(root);
+        let p = ray.at(root);
         let normal = (p - self.centre) / self.radius;
-        return Some(HitRecord::new(r, root, normal, self.material.clone()));
+        return Some(HitRecord::new(ray, root, normal, self.material.clone()));
     }
 }

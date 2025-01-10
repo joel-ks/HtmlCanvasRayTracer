@@ -26,7 +26,7 @@ impl Material for Lambertian {
             }
         };
 
-        let scattered = Ray { origin: hit_record.p, direction };
+        let scattered = Ray { origin: hit_record.hit_point, direction };
 
         Some(Scatter { scattered, attenuation: self.albedo })
     }

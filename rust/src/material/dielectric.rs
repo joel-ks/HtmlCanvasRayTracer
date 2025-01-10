@@ -28,7 +28,7 @@ impl Material for Dielectric {
             direction_norm.refract(hit_record.normal, refraction_index)
         };
 
-        let scattered = Ray { origin: hit_record.p, direction };
+        let scattered = Ray { origin: hit_record.hit_point, direction };
         let attenuation = Colour { x: 1.0, y: 1.0, z: 1.0 };
 
         Some(Scatter { scattered, attenuation })

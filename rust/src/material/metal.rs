@@ -20,7 +20,7 @@ impl Material for Metal {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<Scatter> {
         let reflected = ray.direction.reflect(hit_record.normal);
         let reflected = reflected.normalize() + (self.fuzz * Vec3::random_unit_vector());
-        let scattered = Ray{ origin: hit_record.p, direction: reflected };
+        let scattered = Ray{ origin: hit_record.hit_point, direction: reflected };
 
         if Vec3::dot(scattered.direction, hit_record.normal) > 0.0 {
             return Some(

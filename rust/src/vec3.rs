@@ -1,5 +1,5 @@
 use std::{
-    fmt::Display,
+    fmt::{Display, Formatter},
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
@@ -56,7 +56,7 @@ impl Vec3 {
     pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
         let on_unit_sphere = Vec3::random_unit_vector();
 
-        if Vec3::dot(on_unit_sphere, normal) > 0.0 {
+        if on_unit_sphere.dot(normal) > 0.0 {
             // In the same hemisphere as normal
             on_unit_sphere
         } else {
@@ -97,32 +97,32 @@ impl Vec3 {
     }
 
     pub fn reflect(self, normal: Vec3) -> Vec3 {
-        self - 2.0 * Vec3::dot(self, normal) * normal
+        self - 2.0 * self.dot(normal) * normal
     }
 
     pub fn refract(self, normal: Vec3, refraction_index: f64) -> Vec3 {
-        let cos_theta = Vec3::dot(-self, normal).min(1.0);
+        let cos_theta = -self.dot(normal).min(1.0);
         let r_out_perp = refraction_index * (self + cos_theta * normal);
         let r_out_para = -((1.0 - r_out_perp.length_squared()).abs().sqrt()) * normal;
 
         r_out_perp + r_out_para
     }
 
-    pub fn dot(lhs: Vec3, rhs: Vec3) -> f64 {
-        lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z
+    pub fn dot(self, rhs: Vec3) -> f64 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    pub fn cross(lhs: Vec3, rhs: Vec3) -> Vec3 {
+    pub fn cross(self, rhs: Vec3) -> Vec3 {
         Vec3 {
-            x: lhs.y * rhs.z - lhs.z * rhs.y,
-            y: lhs.z * rhs.x - lhs.x * rhs.z,
-            z: lhs.x * rhs.y - lhs.y * rhs.x,
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
         }
     }
 }
 
 impl Display for Vec3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }

@@ -11,27 +11,27 @@ pub use hittable_list::HittableList;
 pub use sphere::Sphere;
 
 pub trait Hittable {
-    fn hit(&self, r: Ray, ray_t: Interval) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<HitRecord>;
 }
 
 pub struct HitRecord {
-    pub p: Point3,
+    pub hit_point: Point3,
+    pub ray_hit: f64,
     pub normal: Vec3,
-    pub material: Rc<dyn Material>,
-    pub t: f64,
-    pub front_face: bool
+    pub front_face: bool,
+    pub material: Rc<dyn Material>
 }
 
 impl HitRecord {
-    fn new(r: Ray, t: f64, normal: Vec3, material: Rc<dyn Material>) -> HitRecord {
-        let front_face = Vec3::dot(r.direction, normal) < 0.0;
+    fn new(ray: &Ray, ray_hit: f64, normal: Vec3, material: Rc<dyn Material>) -> HitRecord {
+        let front_face = Vec3::dot(ray.direction, normal) < 0.0;
 
         HitRecord {
-            p: r.at(t),
+            hit_point: ray.at(ray_hit),
+            ray_hit,
             normal: if front_face { normal } else { -normal },
-            material,
-            t,
-            front_face
+            front_face,
+            material
         }
     }
 }

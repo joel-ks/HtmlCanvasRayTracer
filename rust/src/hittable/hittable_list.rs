@@ -1,4 +1,4 @@
-use crate::interval::Interval;
+use crate::{interval::Interval, ray::Ray};
 
 use super::{HitRecord, Hittable};
 
@@ -21,13 +21,13 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: crate::ray::Ray, ray_t: Interval) -> Option<super::HitRecord> {
+    fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<super::HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
-        let mut closest = ray_t.max;
+        let mut closest = ray_test_interval.max;
 
         for h in self.hittables.iter() {
-            if let Some(test) = h.hit(r, Interval { min: ray_t.min, max: closest }) {
-                closest = test.t;
+            if let Some(test) = h.hit(ray, &Interval { min: ray_test_interval.min, max: closest }) {
+                closest = test.ray_hit;
                 hit_record = Some(test);
             }
         }

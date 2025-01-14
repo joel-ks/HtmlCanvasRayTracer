@@ -11,6 +11,8 @@ pub struct Sphere {
 }
 
 impl Sphere {
+    // We need a lifetime here in case Material is ever implemented for a reference
+    // https://stackoverflow.com/a/54788788
     pub fn new(centre: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
         Sphere {
             centre,

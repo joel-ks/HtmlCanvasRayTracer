@@ -13,6 +13,8 @@ impl HittableList {
         }
     }
 
+    // We need a lifetime here in case Hittable is ever implemented for a reference
+    // https://stackoverflow.com/a/54788788
     pub fn add(&mut self, hittable: impl Hittable + 'static) {
         self.hittables.push(Box::new(hittable));
     }

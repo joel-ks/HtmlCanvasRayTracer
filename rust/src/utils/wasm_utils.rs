@@ -1,3 +1,13 @@
+use js_sys::Math;
+
+pub fn random() -> f64 {
+    Math::random()
+}
+
+pub fn range_random(min: f64, max: f64) -> f64 {
+    min + (max - min) * Math::random()
+}
+
 pub fn set_panic_hook() {
     // When the `console_error_panic_hook` feature is enabled, we can call the
     // `set_panic_hook` function at least once during initialization, and then

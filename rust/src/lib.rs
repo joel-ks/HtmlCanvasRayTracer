@@ -6,26 +6,27 @@ mod material;
 mod ray;
 mod utils;
 mod vec3;
-mod wasm_utils;
 
 use camera::{Camera, CameraBuilder};
 use colour::{Colour, Pixel};
 use hittable::{HittableList, Sphere};
 use material::{Dielectric, Lambertian, Metal};
 use vec3::{Point3, Vec3};
-use wasm_bindgen::prelude::*;
-use web_sys::js_sys::Math::random;
 
-#[wasm_bindgen]
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub struct Renderer {
     camera: Camera,
     world: HittableList,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 impl Renderer {
     pub fn new(width: u32, height: u32) -> Renderer {
-        wasm_utils::set_panic_hook();
+        #[cfg(target_arch = "wasm32")]
+        utils::set_panic_hook();
 
         let camera = CameraBuilder {
             image_width: width,
@@ -63,7 +64,7 @@ impl Renderer {
                 let centre = Point3 {
                     x: a as f64 + 0.9 * utils::random(),
                     y: 0.2,
-                    z: b as f64 + 0.9 * random()
+                    z: b as f64 + 0.9 * utils::random()
                 };
 
                 static FRONT_OF_SCENE: Point3 = Point3 { x: 4.0, y: 0.2, z: 0.0 };

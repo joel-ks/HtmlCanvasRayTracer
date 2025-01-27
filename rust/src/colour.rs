@@ -1,9 +1,11 @@
 use crate::{interval::Interval, vec3::Vec3};
+
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
 pub type Colour = Vec3;
 
-#[wasm_bindgen]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub struct Pixel {
     pub r: u8,
     pub g: u8,

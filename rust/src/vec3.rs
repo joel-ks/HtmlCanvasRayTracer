@@ -5,7 +5,7 @@ use std::{
 
 use crate::utils;
 
-#[derive(Clone, Copy)] // TODO: add Format?
+#[derive(Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,

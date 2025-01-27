@@ -1,23 +1,24 @@
 {
     "compilerOptions": {
         "outDir": "../js/",
-        "declarationDir": "../types",
         "rootDir": ".",
         "composite": true,
         "target": "ESNext",
         "sourceMap": true,
-        "declarationMap": true,
         "lib": ["ESNext"],
         
+        // Module options
         "module": "ESNext",
         "moduleResolution": "Bundler", // Modern import resolution rules
         "moduleDetection": "force", // Every ts file is a module
         "isolatedModules": true, // Compile modules without reference to other modules (better tooling support)
-        
-        "allowJs": true,
-        "checkJs": true,
         "skipLibCheck": true, // Don't type check libraries (will still use library .d.ts files to typecheck our code)
 
+        // JS compat options
+        "allowJs": true,
+        "checkJs": true,
+        
+        // Compile time checks (some of the recommendations were too strict to me)
         "strict": true,
         "exactOptionalPropertyTypes": true,
         "forceConsistentCasingInFileNames": true,

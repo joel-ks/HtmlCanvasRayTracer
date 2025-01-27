@@ -4,13 +4,40 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
+            "name": "Debug native binary",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/rust/target/debug/native_ray_tracer.exe",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            // Uncomment to always build before debugging
+            // "preLaunchTask": "rust: cargo build native binary (debug)"
+        },
+        {
+            "name": "Open in Firefox",
+            "type": "firefox",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}/wwwroot",
+            "preLaunchTask": "npm: serve and watch"
+        },
+        {
+            "name": "Open in Chrome",
             "type": "chrome",
             "request": "launch",
-            "name": "Open in Chrome",
             "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}/wwwroot"
-        }
+            "webRoot": "${workspaceFolder}/wwwroot",
+            "preLaunchTask": "npm: serve and watch"
+        },
+        {
+            "name": "Open in Edge",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}/wwwroot",
+            "preLaunchTask": "npm: serve and watch"
+        },
     ]
 }

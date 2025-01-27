@@ -1,0 +1,83 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        // Rust (Cargo and Wasm-Pack) tasks
+        {
+            "type": "cargo",
+            "group": "build",
+            "label": "rust: cargo build native binary (debug)",
+            "command": "build",
+            "problemMatcher": "$rustc",
+            "args": ["--bin", "native_ray_tracer"],
+            "options": {
+                "cwd": "${workspaceFolder}/rust"
+            },
+        },
+        {
+            "type": "cargo",
+            "group": "build",
+            "label": "rust: cargo build native binary (release)",
+            "command": "build",
+            "problemMatcher": "$rustc",
+            "args": ["--bin", "native_ray_tracer", "--release"],
+            "options": {
+                "cwd": "${workspaceFolder}/rust"
+            },
+        },
+        {
+            "type": "shell",
+            "label": "rust: wasm-pack build",
+            "group": "build",
+            "command": "wasm-pack",
+            "args": ["build", "--release", "--target", "web"],
+            "options": {
+                "cwd": "${workspaceFolder}/rust"
+            },
+            "problemMatcher": "$rustc",
+        },
+
+        // Customized NPM Script tasks (all are auto-detected but these need to be marked as background tasks and given
+        // a problem matcher)
+        {
+            "type": "npm",
+            "script": "watch",
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": "$tsc-watch",
+            "label": "npm: watch",
+            "detail": "tsc build and watch"
+        },
+        {
+            "type": "npm",
+            "script": "serve",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "external",
+                "source": "Modern Web Dev Server",
+                "pattern": {
+                    "regexp": ""
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "(?:\\u{001b}\\[2J\\u{001b}\\[0f|\\u{001b}\\[2J\\u{001b}\\[H)",
+                    "endsPattern": "^Web Dev Server started..."
+                }
+            },
+            "label": "npm: serve",
+            "detail": "web-dev-server"
+        },
+
+        // Composite task to run before launching the browser
+        {
+            "label": "npm: serve and watch",
+            "problemMatcher": [],
+            "dependsOn": [
+                "rust: wasm-pack build",
+                "npm: serve",
+                "npm: watch",
+            ]
+        }
+    ]
+}

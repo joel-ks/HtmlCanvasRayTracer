@@ -27,5 +27,10 @@
         "noImplicitReturns": true,
         "noUncheckedIndexedAccess": true,
         "verbatimModuleSyntax": true
-    }
+    },
+
+    "references": [
+        { "path": "./main" },
+        { "path": "./worker" },
+    ]
 }

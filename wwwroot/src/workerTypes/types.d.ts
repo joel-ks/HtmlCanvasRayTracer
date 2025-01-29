@@ -1,5 +1,9 @@
+import type { rendererTypes } from "./rendererTypes";
+
+export type RendererType = typeof rendererTypes[number];
+
 export interface WorkerRequest {
-    renderer: "js" | "wasm";
+    rendererType: RendererType;
     width: number;
     height: number;
     data: SharedArrayBuffer;

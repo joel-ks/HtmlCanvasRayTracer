@@ -38,6 +38,6 @@
             "url": "http://localhost:8080",
             "webRoot": "${workspaceFolder}/wwwroot",
             "preLaunchTask": "npm: serve and watch"
-        },
+        }
     ]
 }

@@ -1,8 +1,8 @@
-import { render as renderJs } from "../raytracer/rayTracer";
-import Raytracer from "../raytracer_rust/main";
-import type { WorkerRequest, WorkerUpdate } from "./workerMessageTypes";
+import { render as renderJs } from "../raytracer";
+import Raytracer from "../raytracer_rust";
+import type { WorkerRequest, WorkerUpdate } from "../workerTypes";
 
-declare const self: DedicatedWorkerGlobalScope;
+self.addEventListener('message', (e: MessageEvent<WorkerRequest>) => render(e.data));
 
 const statusUpdate = (message: string) => {
     const update: WorkerUpdate = {
@@ -12,20 +12,11 @@ const statusUpdate = (message: string) => {
     postMessage(update);
 }
 
-self.addEventListener('message', async (e: MessageEvent<WorkerRequest>) => {
+async function render(request: WorkerRequest) {
     const startTime = performance.now();
 
-    if (e.data.renderer === "js") {
-        renderJs(e.data.width, e.data.height, e.data.data, statusUpdate);
-    } else if (e.data.renderer === "wasm") {
-        await Raytracer.init(e.data.width, e.data.height);
-        const raytracer = new Raytracer(e.data.width, e.data.height);
-        try {
-            raytracer.render(e.data.data, statusUpdate);
-        } finally {
-            raytracer.dispose();
-        }
-    }
+    if (request.rendererType === "js") renderJs(request.width, request.height, request.data, statusUpdate);
+    else if (request.rendererType === "wasm") await renderWasm(request.width, request.height, request.data, statusUpdate);
 
     const timeElapsed = performance.now() - startTime;
     const update: WorkerUpdate = {
@@ -33,4 +24,15 @@ self.addEventListener('message', async (e: MessageEvent<WorkerRequest>) => {
         completed: true
     }
     postMessage(update);
-});
+}
+
+async function renderWasm(width: number, height: number, data: SharedArrayBuffer, statusUpdate: (msg: string) => void) {
+    await Raytracer.init(); // Can call every time as it's a no-op after the first call
+
+    const raytracer = new Raytracer(width, height);
+    try {
+        raytracer.render(data, statusUpdate);
+    } finally {
+        raytracer.dispose();
+    }
+}

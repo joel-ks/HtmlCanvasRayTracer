@@ -2,7 +2,7 @@
   "name": "web-canvas-ray-tracer",
   "author": "Joel Kusasira-Sutton",
   "scripts": {
-    "build": "tsc --build wwwroot/src/main",
+    "build": "tsc --build wwwroot/src",
     "serve": "web-dev-server --config web-dev-server.config.mjs",
     "watch": "npm run build -- --watch"
   },

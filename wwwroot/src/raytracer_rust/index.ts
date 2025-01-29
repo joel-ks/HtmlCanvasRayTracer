@@ -43,7 +43,7 @@ export default class Raytracer {
     }
 
     static #wasmModule: InitOutput | null = null;
-    static async init(width: number, height: number) {
+    static async init() {
         if (this.#wasmModule == null) this.#wasmModule = await init();
     }
 }

@@ -3,6 +3,7 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+
         // Rust (Cargo and Wasm-Pack) tasks
         {
             "type": "cargo",
@@ -13,7 +14,7 @@
             "args": ["--bin", "native_ray_tracer"],
             "options": {
                 "cwd": "${workspaceFolder}/rust"
-            },
+            }
         },
         {
             "type": "cargo",
@@ -24,7 +25,7 @@
             "args": ["--bin", "native_ray_tracer", "--release"],
             "options": {
                 "cwd": "${workspaceFolder}/rust"
-            },
+            }
         },
         {
             "type": "shell",
@@ -35,15 +36,14 @@
             "options": {
                 "cwd": "${workspaceFolder}/rust"
             },
-            "problemMatcher": "$rustc",
+            "problemMatcher": "$rustc"
         },
 
         // Customized NPM Script tasks (all are auto-detected but these need to be marked as background tasks and given
-        // a problem matcher)
+        // problem matchers)
         {
             "type": "npm",
             "script": "watch",
-            "group": "build",
             "isBackground": true,
             "problemMatcher": "$tsc-watch",
             "label": "npm: watch",
@@ -54,8 +54,7 @@
             "script": "serve",
             "isBackground": true,
             "problemMatcher": {
-                "owner": "external",
-                "source": "Modern Web Dev Server",
+                "source": "Web Dev Server",
                 "pattern": {
                     "regexp": ""
                 },
@@ -72,12 +71,90 @@
         // Composite task to run before launching the browser
         {
             "label": "npm: serve and watch",
-            "problemMatcher": [],
             "dependsOn": [
                 "rust: wasm-pack build",
-                "npm: serve",
                 "npm: watch",
-            ]
+                "npm: serve",
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        },
+
+        // Maintenance tasks
+        {
+            "label": "clean all outputs",
+            "dependsOn": [
+                "rust: cargo clean",
+                "rust: clean wasm-pack outputs",
+                "npm: clean outputs"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        },
+        {
+            "label": "rust: cargo clean",
+            "type": "cargo",
+            "command": "clean",
+            "problemMatcher": "$rustc",
+            "options": {
+                "cwd": "${workspaceFolder}/rust"
+            }
+        },
+        {
+            "label": "rust: clean wasm-pack outputs",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/rust"
+            },
+            "windows": {
+                "command": "powershell",
+                "args": [
+                    "-command",
+                    "if (Test-Path pkg) { Remove-Item -Recurse -Force pkg }"
+                ]
+            },
+            "linux": {
+                "command": "rm",
+                "args": [
+                    "-rf",
+                    "pkg"
+                ]
+            },
+            "osx": {
+                "command": "rm",
+                "args": [
+                    "-rf",
+                    "pkg"
+                ]
+            }
+        },
+        {
+            "label": "npm: clean outputs",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/wwwroot"
+            },
+            "windows": {
+                "command": "powershell",
+                "args": [
+                    "-command",
+                    "if (Test-Path js) { Remove-Item -Recurse -Force js }"
+                ]
+            },
+            "linux": {
+                "command": "rm",
+                "args": [
+                    "-rf",
+                    "js"
+                ]
+            },
+            "osx": {
+                "command": "rm",
+                "args": [
+                    "-rf",
+                    "js"
+                ]
+            }
         }
     ]
 }

@@ -1,0 +1,61 @@
+# Auto detect text files and perform LF normalization
+*                   text=auto
+
+# Source code
+*.css               text diff=css
+*.scss              text diff=css
+*.htm               text diff=html
+*.html              text diff=html
+*.xhtml             text diff=html
+*.js                text
+*.mjs               text
+*.cjs               text
+*.jsx               text
+*.rs                text
+*.ts                text
+*.tsx               text
+
+# Fixes syntax highlighting on GitHub to allow comments
+tsconfig.json       linguist-language=JSON-with-Comments
+
+# Configs
+*.*ignore           text
+*.*rc               text
+*.conf              text
+*.ini               text
+*.json              text
+*.lock              text -diff
+*.toml              text
+*.xml               text
+*.yaml              text
+*.yml               text
+.editorconfig       text
+.env                text
+.gitattributes      text
+.gitconfig          text
+.gitignore          text
+browserslist        text
+package.json        text
+package-lock.json   text -diff
+
+# Documents
+*.md                text diff=markdown
+*.mdx               text diff=markdown
+
+# Graphics
+*.gif               binary
+*.gifv              binary
+*.ico               binary
+*.jpg               binary
+*.jpeg              binary
+*.png               binary
+*.svg               text
+*.webp              binary
+
+# Text files where line endings should be preserved
+*.patch             -text
+
+# Exclude git config files from exporting
+.gitattributes      export-ignore
+.gitignore          export-ignore
+.gitkeep            export-ignore

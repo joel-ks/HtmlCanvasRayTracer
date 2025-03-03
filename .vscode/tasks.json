@@ -32,6 +32,7 @@
             "label": "rust: wasm-pack build",
             "group": "build",
             "command": "wasm-pack",
+            // Change --release to --dev for debugging in the browser
             "args": ["build", "--release", "--target", "web"],
             "options": {
                 "cwd": "${workspaceFolder}/rust"

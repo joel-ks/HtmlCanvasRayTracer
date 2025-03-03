@@ -7,8 +7,8 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[target.'cfg(target_arch = "wasm32")'.features]
-default = ["console_error_panic_hook"]
+[features]
+default = ["console_error_panic_hook"] # Note: console_error_panic_hook only takes effect for wasm32 targets
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 rand = "0.8"
@@ -22,8 +22,7 @@ web-sys = { version = "0.3", features = ["console"]}
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-test = "0.3.34"
 
-# TODO: investigate enabling WASM debugging by adding:
-# # [package.metadata.wasm-pack.profile.dev.wasm-bindgen]
-# # dwarf-debug-info = true
+# Generate DWARF debug info for dev builds
 # https://github.com/rustwasm/wasm-pack/issues/1351#issuecomment-2100231587
-# NOTE: may require adding Rust sources to WDS root somehow...
+[package.metadata.wasm-pack.profile.dev.wasm-bindgen]
+dwarf-debug-info = true

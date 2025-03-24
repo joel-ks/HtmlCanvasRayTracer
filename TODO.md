@@ -1,7 +1,8 @@
 # My TODO List
-- [x] ~~Setup an EditorConfig~~
-- [ ] Move rust code into src directory
-  - [ ] Check if this means Chrome (or other browsers) can debug the WASM now
+- [x] Setup an EditorConfig
+- [ ] ~~Move rust code into src directory~~
+  - [x] Check if this means Chrome (or other browsers) can debug the WASM now
+  - Can debug with the [Chrome DevTools DWARF debugging support](https://chromewebstore.google.com/detail/pdcpmagijalfljmkmjngeonclgbbannb) and the WebAssembly DWARF Debugging VS Code extension
 - [ ] Form for setting up render configuration
   - [ ] Pass these settings into the renderer (via worker message)
 - [ ] Update Jenkins build (and agents) to be able to build rust code to WASM

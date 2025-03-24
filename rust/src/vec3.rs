@@ -238,3 +238,18 @@ impl SubAssign for Vec3 {
         self.z -= rhs.z;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn origin_is_000()
+    {
+        let origin = Vec3::origin();
+
+        assert_eq!(0.0, origin.x);
+        assert_eq!(0.0, origin.y);
+        assert_eq!(0.0, origin.z);
+    }
+}

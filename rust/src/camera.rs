@@ -37,7 +37,7 @@ impl CameraBuilder {
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
         let viewport_u = viewport_width * u; // Vector across viewport horizontal edge
         let viewport_v = viewport_height * -v; // Vector down viewport vertical edge
-    
+
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         let pixel_delta_u = viewport_u / (self.image_width as f64);
         let pixel_delta_v = viewport_v / (self.image_height as f64);
@@ -84,7 +84,7 @@ pub struct Camera {
 impl Camera {
     pub fn render_pixel(&self, x: u32, y: u32, world: &impl Hittable) -> Pixel {
         let mut colour = Colour { x: 0.0, y: 0.0, z: 0.0 };
-        
+
         for _ in 0..self.samples {
             let ray = self.get_ray(x, y);
             colour += Camera::ray_colour(ray, world, self.max_bounces);
@@ -102,7 +102,7 @@ impl Camera {
             + ((y as f64 + offset.y) * self.pixel_delta_v);
 
         let origin = if self.has_defocus { self.sample_defocus_disk() } else { self.centre };
-        
+
         Ray {
             origin,
             direction: pixel_sample - origin
@@ -122,7 +122,7 @@ impl Camera {
     fn sample_defocus_disk(&self) -> Point3 {
         // Returns a random point in the camera defocus disk.
         let p = Vec3::random_in_unit_disk();
-        
+
         self.centre + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
     }
 

@@ -1,8 +1,9 @@
 {
     "recommendations": [
+        "editorconfig.editorconfig",
+        "firefox-devtools.vscode-firefox-debug",
+        "ms-vscode.wasm-dwarf-debugging",
         "rust-lang.rust-analyzer",
-        "ms-vscode.cpptools",
-        "tamasfe.even-better-toml",
-        "firefox-devtools.vscode-firefox-debug"
+        "tamasfe.even-better-toml"
     ]
 }

@@ -13,6 +13,9 @@ rust/**/*.rs.bk
 /wwwroot/js/
 /wwwroot/types/
 
+# Bundler output
+/dist/
+
 
 ### VisualStudioCode ###
 .vscode/*

@@ -156,6 +156,34 @@
                     "js"
                 ]
             }
+        },
+        {
+            "label": "npm: clean bundle",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "windows": {
+                "command": "powershell",
+                "args": [
+                    "-command",
+                    "if (Test-Path dist) { Remove-Item -Recurse -Force dist }"
+                ]
+            },
+            "linux": {
+                "command": "rm",
+                "args": [
+                    "-rf",
+                    "dist"
+                ]
+            },
+            "osx": {
+                "command": "rm",
+                "args": [
+                    "-rf",
+                    "dist"
+                ]
+            }
         }
     ]
 }

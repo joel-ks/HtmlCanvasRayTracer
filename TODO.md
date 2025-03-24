@@ -9,7 +9,7 @@
 - [ ] Look into using python build scripts instead of VS Code tasks
 
 ### Some fine day:
-- [ ] Bundle with Rollup (or switch to Vite)
+- [x] Bundle with Rollup ~~(or switch to Vite)~~
 - [ ] Bundle CSS
 - [ ] Add Babel for polyfills
 - [ ] ESLint / Biome / Whatever is the current preference for code quality

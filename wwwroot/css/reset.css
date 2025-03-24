@@ -1,0 +1,166 @@
+/*
+ * Modern CSS reset.
+ * Based on:
+ * - https://www.joshwcomeau.com/css/custom-css-reset/
+ * - https://piccalil.li/blog/a-more-modern-css-reset/
+ */
+
+/* Global CSS custom properties */
+:root {
+
+    /* Cross-platform font families */
+    --font-family-sans:
+        system-ui,                      /* Cross-platform generic font family (default user interface font) */
+        -apple-system,                  /* Safari for macOS and iOS (San Francisco) */
+        "Segoe UI",                     /* Windows */
+        Roboto,                         /* Android */
+        "Noto Sans", "Liberation Sans", /* Linux */
+        "Helvetica Neue", Arial,        /* Basic web fallback */
+        sans-serif,                     /* Catch-all */
+
+        /* Emoji fonts */
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+
+    --font-family-mono:
+        SFMono-Regular, Menlo, Monaco,          /* macOS, iOS */
+        "Cascadia Mono", Consolas,              /* Windows */
+        "Roboto Mono",                          /* Android */
+        "Liberation Mono", "DejaVu Sans Mono",  /* Linux */
+        "Courier New",                          /* Basic web fallback */
+        monospace;                              /* Catch-all */
+}
+
+html {
+    /*
+     * Use a more-intuitive box-sizing model.
+     * But allow overriding (e.g. for relative-positioned elements).
+     * c.f. rule below for *, *::before, *::after
+     */
+    box-sizing: border-box;
+
+    /*
+     * Improve consistency of default fonts in all browsers.
+     */
+    font-family: var(--font-family-sans);
+
+    /*
+     * Prevent mobile font-size adjustment
+     * https://kilianvalkhof.com/2022/css-html/your-css-reset-needs-text-size-adjust-probably/
+     */
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+* {
+    /*
+     * Remove default margin from everything so we can directly control it
+     */
+    margin: 0;
+}
+
+body {
+    /*
+     * WCAG recommended line height for main paragraph content
+     */
+    line-height: 1.5;
+
+    /*
+     * Make the body fill the viewport
+     */
+    min-height: 100vh; /* Fallback for any browsers that don't support dvh */
+    min-height: 100dvh;
+
+    /*
+     * Nicer font smoothing
+     * Only affects Webkit browsers on macOS. All other platforms do this already.
+     */
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    /*
+     * Tidier line heights for headings
+     */
+    line-height: 1.1;
+
+    /*
+     * Balanced wrapping on headers looks much nicer
+     */
+    text-wrap: balance;
+}
+p {
+    text-wrap: pretty;
+}
+
+h1, h2, h3, h4, h5, h6,
+p {
+    /*
+     * Prettify broken words on overflow
+     */
+    hyphens: auto;
+
+    /*
+     * Avoid text overflows with very long words
+     */
+    overflow-wrap: break-word;
+}
+
+code, pre, tt, kbd, samp,
+.font-monospace  {
+    /*
+     * Monospace fonts for elements that use it
+     */
+    font-family: var(--font-family-mono);
+}
+
+img,
+picture,
+video,
+canvas {
+    /*
+     * Make media elements block instead of inline by default
+     */
+    display: block;
+
+    /*
+     * Fix overflow
+     */
+    max-width: 100%;
+}
+
+button,
+input,
+label {
+    /*
+     * Tidier line heights for single-line form elements
+     */
+    line-height: 1.1;
+}
+
+button,
+input,
+select,
+textarea {
+    /*
+     * Reset typography styles for form controls
+     */
+    font-family: inherit;
+    font-size: inherit;
+}
+
+textarea:not([rows]) {
+    /*
+     * Make sure textareas without a rows attribute are not tiny
+     */
+    min-height: 10em;
+}

@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
         "outDir": "../js/",
+        // "declarationDir": "../types",
         "rootDir": ".",
         "composite": true,
         "target": "ESNext",
         "sourceMap": true,
         "lib": ["ESNext"],
-        
+
         // Module options
         "module": "ESNext",
         "moduleResolution": "Bundler", // Modern import resolution rules
@@ -17,7 +18,7 @@
         // JS compat options
         "allowJs": true,
         "checkJs": true,
-        
+
         // Compile time checks (some of the recommendations were too strict to me)
         "strict": true,
         "exactOptionalPropertyTypes": true,

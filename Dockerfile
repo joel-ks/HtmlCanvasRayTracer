@@ -6,34 +6,35 @@ RUN cargo install wasm-pack
 WORKDIR /usr/src/rust
 COPY rust/ .
 
-# TODO: tests run in dev profile but final bundle should use the release build
-RUN wasm-pack build --dev --target web
+RUN wasm-pack build --release --target web
 
 
 # Base image for Node.js tasks
 FROM node:lts AS node
 
 WORKDIR /usr/src
-COPY --from=rust /usr/src/rust/pkg ./rust/pkg
-COPY wwwroot/ ./wwwroot
-COPY package.json package-lock.json rollup.config.mjs .
 
-RUN npm install && npm run build
+COPY package.json package-lock.json rollup.config.mjs .
+COPY --from=rust /usr/src/rust/pkg ./rust/pkg
+RUN npm install
+
+COPY wwwroot/ ./wwwroot
+RUN npm run build
 
 
 FROM rust AS rusttestrunner
 
 # TODO: how to publish test results/coverage?
-ENTRYPOINT ["cargo", "test", "--lib"]
+ENTRYPOINT ["cargo", "test", "--profile", "release", "--lib"]
 
 
 # Run wasm-pack browser tests
-FROM rust AS rustbrowsertestrunner
+# FROM rust AS rustbrowsertestrunner
 
 # TODO: how to publish test results/coverage?
 # TODO: how to configure test browser at runtime?
 # TODO: Error: http://127.0.0.1:<random port>/session: status code 500
-ENTRYPOINT ["wasm-pack", "test", "--headless", "--firefox"]
+# ENTRYPOINT ["wasm-pack", "test", "--release", "--headless", "--firefox"]
 
 
 # Run JS/TS tests

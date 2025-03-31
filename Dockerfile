@@ -1,7 +1,7 @@
 # Build rust code to WASM
 FROM rust:1.85.0 AS rust
 
-RUN cargo install wasm-pack
+RUN cargo install --locked wasm-pack
 
 WORKDIR /usr/src/rust
 COPY rust/ .
@@ -16,7 +16,7 @@ WORKDIR /usr/src
 
 COPY package.json package-lock.json rollup.config.mjs .
 COPY --from=rust /usr/src/rust/pkg ./rust/pkg
-RUN npm install
+RUN npm ci
 
 COPY wwwroot/ ./wwwroot
 RUN npm run build

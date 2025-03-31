@@ -27,7 +27,7 @@ pipeline {
                 script {
                     def bundleImg = docker.build("bundle", "--target bundler .")
                     bundleImg.withRun("--rm", "/bin/sh") {
-                        sh "docker cp ${it.id}:/usr/src/dist/ ./dist/"
+                        sh "docker cp ${it.id}:/usr/src/dist ./dist"
                     }
                 }
 

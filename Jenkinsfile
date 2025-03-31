@@ -6,8 +6,8 @@ pipeline {
                 checkout scm
 
                 script {
-                    docker.build("rust-base", "--target rust")
-                    docker.build("node-base", "--target node")
+                    docker.build("rust-base", "--target rust .")
+                    docker.build("node-base", "--target node .")
                 }
             }
         }
@@ -15,7 +15,7 @@ pipeline {
         stage ("Run tests") {
             steps {
                 script {
-                    docker.build("rust-test", "--target rusttestrunner").run()
+                    docker.build("rust-test", "--target rusttestrunner .").run()
                 }
             }
         }
@@ -23,7 +23,7 @@ pipeline {
         stage("Publish") {
             steps {
                 script {
-                    def bundleImg = docker.build("bundle", "--target bundler")
+                    def bundleImg = docker.build("bundle", "--target bundler .")
                     bundleImg.withRun("/bin/sh") {
                         sh 'docker cp ${it.id}:/usr/src/dist/ ./dist/'
                     }

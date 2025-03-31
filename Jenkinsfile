@@ -18,10 +18,7 @@ pipeline {
                 script {
                     def testrunnerImg = docker.build("rust-test", "--target rusttestrunner .")
 
-                    // TODO: how to publish pass/coverage reports
-                    // testrunnerImg.withRun {
-                    //     sh "docker logs --follow ${it.id}"
-                    // }
+                    // TODO: how to publish success/coverage reports
                     sh "docker run --rm ${testrunnerImg.id}"
                 }
             }

@@ -17,7 +17,11 @@ pipeline {
             steps {
                 script {
                     def testrunnerImg = docker.build("rust-test", "--target rusttestrunner .")
-                    testrunnerImg.run("--rm")
+
+                    // TODO: how to publish pass/coverage reports
+                    testrunnerImg.withRun("--rm") {
+                        sh "docker logs -f ${it.id}"
+                    }
                 }
             }
         }
@@ -28,10 +32,10 @@ pipeline {
                     def bundleImg = docker.build("bundle", "--target bundler .")
                     bundleImg.withRun("", "/bin/sh") {
                         sh "docker cp ${it.id}:/usr/src/dist ./dist"
+                        // TODO: how to remove the container only after the cp has completed
                     }
                 }
 
-                // This includes the tsconfig.tsbuildinfo incremental build files. TODO: somehow exclude them
                 archiveArtifacts artifacts: "dist/**", onlyIfSuccessful: true
             }
         }

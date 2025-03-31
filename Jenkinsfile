@@ -19,7 +19,7 @@ pipeline {
                     def testrunnerImg = docker.build("rust-test", "--target rusttestrunner .")
 
                     // TODO: how to publish pass/coverage reports
-                    testrunnerImg.withRun("--rm") {
+                    testrunnerImg.withRun {
                         sh "docker logs -f ${it.id}"
                     }
                 }
@@ -32,7 +32,6 @@ pipeline {
                     def bundleImg = docker.build("bundle", "--target bundler .")
                     bundleImg.withRun("", "/bin/sh") {
                         sh "docker cp ${it.id}:/usr/src/dist ./dist"
-                        // TODO: how to remove the container only after the cp has completed
                     }
                 }
 

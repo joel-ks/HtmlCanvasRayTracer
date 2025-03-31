@@ -27,12 +27,12 @@ pipeline {
                 script {
                     def bundleImg = docker.build("bundle", "--target bundler .")
                     bundleImg.withRun("--rm", "/bin/sh") {
-                        sh 'docker cp ${it.id}:/usr/src/dist/ ./dist/'
+                        sh "docker cp ${it.id}:/usr/src/dist/ ./dist/"
                     }
                 }
 
                 // This includes the tsconfig.tsbuildinfo incremental build files. TODO: somehow exclude them
-                archiveArtifacts artifacts: 'dist/**', onlyIfSuccessful: true
+                archiveArtifacts artifacts: "dist/**", onlyIfSuccessful: true
             }
         }
     }

@@ -19,9 +19,10 @@ pipeline {
                     def testrunnerImg = docker.build("rust-test", "--target rusttestrunner .")
 
                     // TODO: how to publish pass/coverage reports
-                    testrunnerImg.withRun {
-                        sh "docker logs -f ${it.id}"
-                    }
+                    // testrunnerImg.withRun {
+                    //     sh "docker logs --follow ${it.id}"
+                    // }
+                    sh "docker run --rm ${testrunnerImg.id}"
                 }
             }
         }
@@ -42,7 +43,7 @@ pipeline {
 
     post {
         cleanup {
-            sh "docker image prune -a"
+            sh "docker image prune --all --force"
         }
     }
 }

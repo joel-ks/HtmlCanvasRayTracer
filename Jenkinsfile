@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     stages {
         stage ("Build") {
             steps {
@@ -15,7 +16,8 @@ pipeline {
         stage ("Run tests") {
             steps {
                 script {
-                    docker.build("rust-test", "--target rusttestrunner .").run()
+                    def testrunnerImg = docker.build("rust-test", "--target rusttestrunner .")
+                    testrunnerImg.run("--rm")
                 }
             }
         }
@@ -24,7 +26,7 @@ pipeline {
             steps {
                 script {
                     def bundleImg = docker.build("bundle", "--target bundler .")
-                    bundleImg.withRun("/bin/sh") {
+                    bundleImg.withRun("--rm", "/bin/sh") {
                         sh 'docker cp ${it.id}:/usr/src/dist/ ./dist/'
                     }
                 }

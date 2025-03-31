@@ -252,4 +252,10 @@ mod tests {
         assert_eq!(0.0, origin.y);
         assert_eq!(0.0, origin.z);
     }
+
+    #[test]
+    fn should_fail()
+    {
+        assert_eq!(5, 2+2)
+    }
 }

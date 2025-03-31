@@ -39,4 +39,10 @@ pipeline {
             }
         }
     }
+
+    post {
+        cleanup {
+            sh "docker image prune -a"
+        }
+    }
 }

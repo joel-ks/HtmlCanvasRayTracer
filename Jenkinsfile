@@ -5,20 +5,32 @@ pipeline {
             steps {
                 checkout scm
 
-                nodejs(nodeJSInstallationName: 'Node 20.15') {
-                    sh 'npm clean-install'
-                    sh 'npm run build -- --sourceMap false'
+                script {
+                    docker.build("rust-base", "--target rust")
+                    docker.build("node-base", "--target node")
+                }
+            }
+        }
+
+        stage ("Run tests") {
+            steps {
+                script {
+                    docker.build("rust-test", "--target rusttestrunner").run()
                 }
             }
         }
 
         stage("Publish") {
             steps {
-                sh 'cp wwwroot/index.html .'
-                sh 'cp -R wwwroot/js/ .'
+                script {
+                    def bundleImg = docker.build("bundle", "--target bundler")
+                    bundleImg.withRun("/bin/sh") {
+                        sh 'docker cp ${it.id}:/usr/src/dist/ ./dist/'
+                    }
+                }
 
                 // This includes the tsconfig.tsbuildinfo incremental build files. TODO: somehow exclude them
-                archiveArtifacts artifacts: 'index.html, js/**', onlyIfSuccessful: true
+                archiveArtifacts artifacts: 'dist/**', onlyIfSuccessful: true
             }
         }
     }

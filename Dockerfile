@@ -49,6 +49,4 @@ FROM node AS bundler
 RUN npm run bundle
 
 
-# FROM nginx:latest AS server
-
-# TODO: copy bundle and any Nginx config required
+# TODO: how to distribute this app? (Nginx server, copy bundle to another image, ...)

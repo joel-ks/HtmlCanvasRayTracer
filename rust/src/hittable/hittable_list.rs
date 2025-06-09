@@ -32,6 +32,6 @@ impl Hittable for HittableList {
             }
         }
 
-        return hit_record;
+        hit_record
     }
 }

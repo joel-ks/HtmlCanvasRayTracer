@@ -90,7 +90,7 @@ impl Camera {
             colour += Camera::ray_colour(&ray, world, self.max_bounces);
         }
 
-        return Pixel::from_colour(self.pixel_samples_scale * colour);
+        Pixel::from_colour(self.pixel_samples_scale * colour)
     }
 
     fn get_ray(&self, x: u32, y: u32) -> Ray {
@@ -102,16 +102,18 @@ impl Camera {
             + ((y as f64 + offset.y) * self.pixel_delta_v);
 
         let origin = if self.has_defocus { self.sample_defocus_disk() } else { self.centre };
+        let time = utils::random();
 
         Ray {
             origin,
-            direction: pixel_sample - origin
+            direction: pixel_sample - origin,
+            time
         }
     }
 
     /// Returns the vector to a random point in the \[-.5,-.5\]-\[+.5,+.5\] unit square.
     fn sample_square() -> Vec3 {
-        return Vec3
+        Vec3
         {
             x: utils::random() - 0.5,
             y: utils::random() - 0.5,
@@ -127,7 +129,7 @@ impl Camera {
     }
 
     fn ray_colour(ray: &Ray, world: &impl Hittable, bounce_limit: u32) -> Colour {
-        if bounce_limit <= 0 {
+        if bounce_limit == 0 {
             return Colour::origin();
         }
 
@@ -135,7 +137,7 @@ impl Camera {
             ray,
             &Interval {
                 min: 0.001,
-                max: utils::INFINITY,
+                max: f64::INFINITY,
             },
         );
 
@@ -162,6 +164,6 @@ impl Camera {
         let dir_norm = ray.direction.normalize();
         let a = 0.5 * (dir_norm.y + 1.0);
 
-        return (1.0 - a) * START_COLOUR + a * END_COLOUR;
+        (1.0 - a) * START_COLOUR + a * END_COLOUR
     }
 }

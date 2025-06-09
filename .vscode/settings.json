@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "Raytracer"
-    ]
+    ],
+    "rust-analyzer.check.command": "clippy"
 }

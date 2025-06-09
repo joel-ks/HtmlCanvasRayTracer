@@ -5,7 +5,7 @@ use crate::{interval::Interval, material::Material, ray::Ray, vec3::{Point3, Vec
 use super::{HitRecord, Hittable};
 
 pub struct Sphere {
-    centre: Point3,
+    centre: Ray,
     radius: f64,
     material: Rc<dyn Material>
 }
@@ -15,7 +15,17 @@ impl Sphere {
     // https://stackoverflow.com/a/54788788
     pub fn new(centre: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
         Sphere {
-            centre,
+            centre: Ray { origin: centre, direction: Vec3::origin(), time: 0.0 },
+            radius: radius.max(0.0),
+            material: Rc::new(material)
+        }
+    }
+
+    // We need a lifetime here in case Material is ever implemented for a reference
+    // https://stackoverflow.com/a/54788788
+    pub fn new_with_motion(centre: Point3, centre2: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
+        Sphere {
+            centre: Ray { origin: centre, direction: centre2 - centre, time: 0.0 },
             radius: radius.max(0.0),
             material: Rc::new(material)
         }
@@ -33,7 +43,8 @@ impl Hittable for Sphere {
         //      - c = ((O-C)⋅(O-C))−r^2
         // Since b has a factor of -2 we can simplify by setting h = b/-2 = D⋅(O-C)
         // => Formula simplifies to: (h ± sqrt(h^2 - ac)) / a
-        let oc = self.centre - ray.origin; // precalculate as this is part of h and c
+        let current_centre = self.centre.at(ray.time);
+        let oc = current_centre - ray.origin; // precalculate as this is part of h and c
         let a = ray.direction.length_squared();
         let h = Vec3::dot(ray.direction, oc);
         let c = Vec3::dot(oc, oc) - self.radius * self.radius;
@@ -57,7 +68,8 @@ impl Hittable for Sphere {
         }
 
         let p = ray.at(root);
-        let normal = (p - self.centre) / self.radius;
-        return Some(HitRecord::new(ray, root, normal, self.material.clone()));
+        let normal = (p - current_centre) / self.radius;
+
+        Some(HitRecord::new(ray, root, normal, self.material.clone()))
     }
 }

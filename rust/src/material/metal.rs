@@ -11,7 +11,7 @@ impl Metal {
     pub fn new(albedo: Colour, fuzz: f64) -> Metal {
         static FUZZ_RANGE: Interval = Interval { min: 0.0, max: 1.0 };
         let fuzz = FUZZ_RANGE.clamp(fuzz);
-        
+
         Metal { albedo, fuzz }
     }
 }
@@ -20,14 +20,14 @@ impl Material for Metal {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<Scatter> {
         let reflected = ray.direction.reflect(hit_record.normal);
         let reflected = reflected.normalize() + (self.fuzz * Vec3::random_unit_vector());
-        let scattered = Ray{ origin: hit_record.hit_point, direction: reflected };
+        let scattered = Ray{ origin: hit_record.hit_point, direction: reflected, time: ray.time };
 
         if Vec3::dot(scattered.direction, hit_record.normal) > 0.0 {
-            return Some(
+            Some(
                 Scatter { scattered, attenuation: self.albedo }
-            );
+            )
         } else {
-            return None;
+            None
         }
     }
 }

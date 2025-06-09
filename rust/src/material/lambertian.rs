@@ -13,7 +13,7 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _: &Ray, hit_record: &HitRecord) -> Option<Scatter> {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<Scatter> {
         let direction = {
             // let direction = Vec3::random_on_hemisphere(hit_record.normal); // hemispheric distribution
             let direction = hit_record.normal + Vec3::random_unit_vector(); // Lambertian distribution
@@ -26,7 +26,7 @@ impl Material for Lambertian {
             }
         };
 
-        let scattered = Ray { origin: hit_record.hit_point, direction };
+        let scattered = Ray { origin: hit_record.hit_point, direction, time: ray.time };
 
         Some(Scatter { scattered, attenuation: self.albedo })
     }

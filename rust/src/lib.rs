@@ -37,7 +37,7 @@ impl Renderer {
             up: Vec3 { x: 0.0, y: 1.0, z: 0.0 },
             defocus_angle: 0.6,
             focal_length: 10.0,
-            samples: 100,
+            samples: 25,
             max_bounces: 50
         }.build();
         let world = Renderer::generate_world();
@@ -73,7 +73,8 @@ impl Renderer {
 
                     if choose_mat < 0.8 {
                         let material = Lambertian::new(Colour::random() * Colour::random());
-                        world.add(Sphere::new(centre, 0.2, material));
+                        let centre2 = centre + Vec3 { x: 0.0, y: utils::range_random(0.0, 0.5), z: 0.0 };
+                        world.add(Sphere::new_with_motion(centre, centre2, 0.2, material));
                     } else if choose_mat < 0.95 {
                         let material = Metal::new(Colour::range_random(0.5, 1.0), utils::range_random(0.0, 0.5));
                         world.add(Sphere::new(centre, 0.2, material));
@@ -101,6 +102,6 @@ impl Renderer {
             Metal::new(Vec3 { x: 0.7, y: 0.6, z: 0.5 }, 0.0)
         ));
 
-        return world;
+        world
     }
 }

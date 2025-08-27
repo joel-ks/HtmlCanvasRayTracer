@@ -1,22 +1,24 @@
 use crate::{interval::Interval, ray::Ray};
 
-use super::{HitRecord, Hittable};
+use super::{HitRecord, Hittable, Aabb};
 
 pub struct HittableList {
-    hittables: Vec<Box<dyn Hittable>>
+    hittables: Vec<Box<dyn Hittable>>,
+    bbox: Aabb
 }
 
 impl HittableList {
     pub fn new() -> HittableList {
         HittableList {
-            hittables: Vec::new()
+            hittables: Vec::new(),
+            bbox: Aabb::default()
         }
     }
 
-    // We need a lifetime here in case Hittable is ever implemented for a reference
-    // https://stackoverflow.com/a/54788788
-    pub fn add(&mut self, hittable: impl Hittable + 'static) {
-        self.hittables.push(Box::new(hittable));
+    pub fn push(&mut self, hittable: Box<dyn Hittable>) {
+        // Need to update the AABB first because we can't borrow the hittable after it's moved into the Box
+        self.bbox = Aabb::union(&self.bbox, hittable.bounding_box());
+        self.hittables.push(hittable);
     }
 }
 
@@ -33,5 +35,9 @@ impl Hittable for HittableList {
         }
 
         hit_record
+    }
+
+    fn bounding_box(&self) -> &Aabb {
+        &self.bbox
     }
 }

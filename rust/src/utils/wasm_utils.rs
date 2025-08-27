@@ -4,7 +4,11 @@ pub fn random() -> f64 {
     Math::random()
 }
 
-pub fn range_random(min: f64, max: f64) -> f64 {
+pub fn range_random_i32(min: i32, max: i32) -> i32 {
+    (min as f64 + (max - min) as f64 * Math::random()) as i32
+}
+
+pub fn range_random_f64(min: f64, max: f64) -> f64 {
     min + (max - min) * Math::random()
 }
 

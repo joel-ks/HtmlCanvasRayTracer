@@ -2,32 +2,42 @@ use std::rc::Rc;
 
 use crate::{interval::Interval, material::Material, ray::Ray, vec3::{Point3, Vec3}};
 
-use super::{HitRecord, Hittable};
+use super::{HitRecord, Hittable, Aabb};
 
 pub struct Sphere {
     centre: Ray,
     radius: f64,
-    material: Rc<dyn Material>
+    material: Rc<dyn Material>,
+
+    bbox: Aabb
 }
 
 impl Sphere {
     // We need a lifetime here in case Material is ever implemented for a reference
     // https://stackoverflow.com/a/54788788
     pub fn new(centre: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
+        let rvec = Vec3 { x: radius, y: radius, z: radius };
+
         Sphere {
             centre: Ray { origin: centre, direction: Vec3::origin(), time: 0.0 },
             radius: radius.max(0.0),
-            material: Rc::new(material)
+            material: Rc::new(material),
+            bbox: Aabb::between_points(centre - rvec, centre + rvec)
         }
     }
 
     // We need a lifetime here in case Material is ever implemented for a reference
     // https://stackoverflow.com/a/54788788
     pub fn new_with_motion(centre: Point3, centre2: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
+        let rvec = Vec3 { x: radius, y: radius, z: radius };
+        let aabb1 = Aabb::between_points(centre - rvec, centre + rvec);
+        let aabb2 = Aabb::between_points(centre2 - rvec, centre2 + rvec);
+
         Sphere {
             centre: Ray { origin: centre, direction: centre2 - centre, time: 0.0 },
             radius: radius.max(0.0),
-            material: Rc::new(material)
+            material: Rc::new(material),
+            bbox: Aabb::union(&aabb1, &aabb2)
         }
     }
 }
@@ -71,5 +81,9 @@ impl Hittable for Sphere {
         let normal = (p - current_centre) / self.radius;
 
         Some(HitRecord::new(ray, root, normal, self.material.clone()))
+    }
+
+    fn bounding_box(&self) -> &Aabb {
+        &self.bbox
     }
 }

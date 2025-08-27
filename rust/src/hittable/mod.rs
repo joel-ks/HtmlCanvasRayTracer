@@ -1,3 +1,5 @@
+mod aabb;
+mod binary_tree_bvh;
 mod hittable_list;
 mod sphere;
 
@@ -7,11 +9,14 @@ use crate::{
     interval::Interval, material::Material, ray::Ray, vec3::{Point3, Vec3}
 };
 
+pub use aabb::Aabb;
+pub use binary_tree_bvh::BinaryTreeBvh;
 pub use hittable_list::HittableList;
 pub use sphere::Sphere;
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<HitRecord>;
+    fn bounding_box(&self) -> &Aabb;
 }
 
 pub struct HitRecord {

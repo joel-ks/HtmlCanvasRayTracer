@@ -8,6 +8,8 @@
 - [x] Update Jenkins build (and agents) to be able to build rust code to WASM
 - [ ] Investigate if std::ops::Range can replace Inverval (and be used more in the random... functions)
 - [ ] Second pass on function args/returns that should be references vs values
+- [ ] Enum for axis instead of u32s?
+- [ ] Newtype instead of alias for `Colour`/`Point`
 
 ### Some fine day:
 - [x] Bundle with Rollup ~~(or switch to Vite)~~

@@ -87,7 +87,7 @@ impl Camera {
 
         for _ in 0..self.samples {
             let ray = self.get_ray(x, y);
-            colour += Camera::ray_colour(&ray, world, self.max_bounces);
+            colour += Camera::ray_colour(ray, world, self.max_bounces);
         }
 
         Pixel::from_colour(self.pixel_samples_scale * colour)
@@ -128,14 +128,14 @@ impl Camera {
         self.centre + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
     }
 
-    fn ray_colour(ray: &Ray, world: &impl Hittable, bounce_limit: u32) -> Colour {
+    fn ray_colour(ray: Ray, world: &impl Hittable, bounce_limit: u32) -> Colour {
         if bounce_limit == 0 {
             return Colour::origin();
         }
 
         let hit_record = world.hit(
-            ray,
-            &Interval {
+            &ray,
+            Interval {
                 min: 0.001,
                 max: f64::INFINITY,
             },
@@ -143,27 +143,27 @@ impl Camera {
 
         // Trace ray off the object that was hit
         if let Some(hit_record) = hit_record {
-            if let Some(scatter) = hit_record.material.scatter(ray, &hit_record) {
-                return scatter.attenuation * Camera::ray_colour(&scatter.scattered, world, bounce_limit - 1);
+            if let Some(scatter) = hit_record.material.scatter(&ray, &hit_record) {
+                return scatter.attenuation * Camera::ray_colour(scatter.scattered, world, bounce_limit - 1);
             } else {
                 return Colour::origin();
             }
         }
 
-        static START_COLOUR: Colour = Colour {
+        let dir_norm = ray.direction.normalize();
+        let a = 0.5 * (dir_norm.y + 1.0);
+
+        const SKY_COLOUR_TOP: Colour = Colour {
             x: 1.0,
             y: 1.0,
             z: 1.0,
         };
-        static END_COLOUR: Colour = Colour {
+        const SKY_COLOUR_BOTTOM: Colour = Colour {
             x: 0.5,
             y: 0.7,
             z: 1.0,
         };
 
-        let dir_norm = ray.direction.normalize();
-        let a = 0.5 * (dir_norm.y + 1.0);
-
-        (1.0 - a) * START_COLOUR + a * END_COLOUR
+        (1.0 - a) * SKY_COLOUR_TOP + a * SKY_COLOUR_BOTTOM
     }
 }

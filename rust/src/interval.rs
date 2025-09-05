@@ -5,12 +5,16 @@ pub struct Interval {
 }
 
 impl Interval {
-    pub fn union(a: &Interval, b: &Interval)  -> Interval {
+    pub fn union(a: Interval, b: Interval)  -> Interval {
         // Create the interval tightly enclosing the two input intervals.
         Interval {
             min: if a.min <= b.min { a.min } else { b.min },
             max: if a.max >= b.max { a.max } else { b.max }
         }
+    }
+
+    pub fn size(&self) -> f64 {
+        self.max - self.min
     }
 
     pub fn surrounds(&self, value: f64) -> bool {

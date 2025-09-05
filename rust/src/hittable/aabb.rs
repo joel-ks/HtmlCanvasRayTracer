@@ -30,27 +30,35 @@ impl Aabb {
         }
     }
 
-    pub fn union(a: &Aabb, b: &Aabb) -> Aabb {
+    pub fn union(a: Aabb, b: Aabb) -> Aabb {
         Aabb {
-            x: Interval::union(&a.x, &b.x),
-            y: Interval::union(&a.y, &b.y),
-            z: Interval::union(&a.z, &b.z)
+            x: Interval::union(a.x, b.x),
+            y: Interval::union(a.y, b.y),
+            z: Interval::union(a.z, b.z)
         }
     }
 
-    pub fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<Interval> {
-        let ray_test_interval = Self::check_intersect_axis(&self.x, 1.0 / ray.direction.x, ray.origin.x, ray_test_interval)?;
-        let ray_test_interval = Self::check_intersect_axis(&self.y, 1.0 / ray.direction.y, ray.origin.y, &ray_test_interval)?;
-        let ray_test_interval = Self::check_intersect_axis(&self.z, 1.0 / ray.direction.z, ray.origin.z, &ray_test_interval)?;
+    pub fn hit(&self, ray: &Ray, ray_test_interval: Interval) -> Option<Interval> {
+        let ray_test_interval = Self::check_intersect_axis(self.x, 1.0 / ray.direction.x, ray.origin.x, ray_test_interval)?;
+        let ray_test_interval = Self::check_intersect_axis(self.y, 1.0 / ray.direction.y, ray.origin.y, ray_test_interval)?;
+        let ray_test_interval = Self::check_intersect_axis(self.z, 1.0 / ray.direction.z, ray.origin.z, ray_test_interval)?;
 
         Some(ray_test_interval)
     }
 
+    pub fn longest_axis(&self) -> u32 {
+        if self.x.size() > self.y.size() {
+            if self.x.size() > self.z.size() { 0 }
+            else { 2 }
+        } else if self.y.size() > self.z.size() { 1 }
+        else { 2 }
+    }
+
     fn check_intersect_axis(
-        axis_interval: &Interval,
+        axis_interval: Interval,
         axis_direction_inv: f64,
         axis_ray_origin: f64,
-        ray_test_interval: &Interval,
+        ray_test_interval: Interval,
     ) -> Option<Interval> {
         let t0 = (axis_interval.min - axis_ray_origin) * axis_direction_inv;
         let t1 = (axis_interval.max - axis_ray_origin) * axis_direction_inv;

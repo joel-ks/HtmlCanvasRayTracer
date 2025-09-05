@@ -45,16 +45,18 @@ impl Renderer {
         }.build();
         let world = Renderer::generate_world();
 
-        Renderer { camera, world }
+        Renderer {
+            camera,
+            // world: HittableList::of_hittables(world)
+            world: BinaryTreeBvh::new(world)
+        }
     }
 
     pub fn render_pixel(&self, width: u32, height: u32) -> Pixel {
         self.camera.render_pixel(width, height, &self.world)
     }
 
-    // fn generate_world() -> HittableList {
-    fn generate_world() -> BinaryTreeBvh {
-        // let mut world = HittableList::new();
+    fn generate_world() -> Vec<Box<dyn Hittable>> {
         let mut world = Vec::<Box<dyn Hittable>>::new();
 
         // Ground
@@ -107,7 +109,6 @@ impl Renderer {
             Metal::new(Vec3 { x: 0.7, y: 0.6, z: 0.5 }, 0.0)
         )));
 
-        // world
-        BinaryTreeBvh::new(world)
+        world
     }
 }

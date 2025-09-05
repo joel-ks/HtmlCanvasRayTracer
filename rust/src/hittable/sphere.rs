@@ -37,13 +37,13 @@ impl Sphere {
             centre: Ray { origin: centre, direction: centre2 - centre, time: 0.0 },
             radius: radius.max(0.0),
             material: Rc::new(material),
-            bbox: Aabb::union(&aabb1, &aabb2)
+            bbox: Aabb::union(aabb1, aabb2)
         }
     }
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, ray_test_interval: Interval) -> Option<HitRecord> {
         // Equation for ray(O,D) intersects sphere(C,r):
         // => t^2(D⋅D)-2t(D⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
         // Solve for t to determine if ray intersects at any point:
@@ -83,7 +83,7 @@ impl Hittable for Sphere {
         Some(HitRecord::new(ray, root, normal, self.material.clone()))
     }
 
-    fn bounding_box(&self) -> &Aabb {
-        &self.bbox
+    fn bounding_box(&self) -> Aabb {
+        self.bbox
     }
 }

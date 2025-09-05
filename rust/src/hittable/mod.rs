@@ -15,8 +15,8 @@ pub use hittable_list::HittableList;
 pub use sphere::Sphere;
 
 pub trait Hittable {
-    fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<HitRecord>;
-    fn bounding_box(&self) -> &Aabb;
+    fn hit(&self, ray: &Ray, ray_test_interval: Interval) -> Option<HitRecord>;
+    fn bounding_box(&self) -> Aabb;
 }
 
 pub struct HitRecord {

@@ -16,7 +16,7 @@ use vec3::{Point3, Vec3};
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-use crate::hittable::{BinaryTreeBvh, Hittable, HittableList};
+use crate::{hittable::{BinaryTreeBvh, Hittable, HittableList}, material::texture::{CheckerTexture, SolidColour, Texture}};
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub struct Renderer {
@@ -62,7 +62,10 @@ impl Renderer {
         // Ground
         world.push(Box::new(Sphere::new(
             Point3 { x: 0.0, y: -1000.0, z: 0.0 }, 1000.0,
-            Lambertian::new(Vec3 { x: 0.5, y: 0.5, z: 0.5 })
+            Lambertian::new(Box::new(CheckerTexture::new(0.32,
+                Box::new(SolidColour::new(Colour { x: 0.2, y: 0.3, z: 0.1 })),
+                Box::new(SolidColour::new(Colour { x: 0.9, y: 0.9, z: 0.9 }))
+            )))
         )));
 
         // Lots of random small spheres
@@ -79,7 +82,7 @@ impl Renderer {
                     let choose_mat = utils::random();
 
                     if choose_mat < 0.8 {
-                        let material = Lambertian::new(Colour::random() * Colour::random());
+                        let material = Lambertian::new_with_colour(Colour::random() * Colour::random());
                         let centre2 = centre + Vec3 { x: 0.0, y: utils::range_random_f64(0.0, 0.5), z: 0.0 };
                         world.push(Box::new(Sphere::new_with_motion(centre, centre2, 0.2, material)));
                     } else if choose_mat < 0.95 {
@@ -101,7 +104,7 @@ impl Renderer {
 
         world.push(Box::new(Sphere::new(
             Point3 { x: -4.0, y: 1.0, z: 0.0 }, 1.0,
-            Lambertian::new(Vec3 { x: 0.4, y: 0.2, z: 0.1 })
+            Lambertian::new_with_colour(Vec3 { x: 0.4, y: 0.2, z: 0.1 })
         )));
 
         world.push(Box::new(Sphere::new(

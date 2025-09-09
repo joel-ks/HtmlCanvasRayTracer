@@ -1,6 +1,7 @@
 mod dielectric;
 mod lambertian;
 mod metal;
+pub mod texture;
 
 pub use dielectric::Dielectric;
 pub use lambertian::Lambertian;

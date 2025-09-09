@@ -23,6 +23,8 @@ pub struct HitRecord {
     pub hit_point: Point3,
     pub ray_hit: f64,
     pub normal: Vec3,
+    pub u: f64,
+    pub v: f64,
     pub front_face: bool,
     pub material: Rc<dyn Material>
 }
@@ -35,6 +37,7 @@ impl HitRecord {
             hit_point: ray.at(ray_hit),
             ray_hit,
             normal: if front_face { normal } else { -normal },
+            u: 0.0, v: 0.0,
             front_face,
             material
         }

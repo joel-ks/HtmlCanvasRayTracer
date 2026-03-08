@@ -9,42 +9,49 @@
 :root {
 
     /* Cross-platform font families */
-    --font-family-sans:
-        system-ui,                      /* Cross-platform generic font family (default user interface font) */
-        -apple-system,                  /* Safari for macOS and iOS (San Francisco) */
-        "Segoe UI",                     /* Windows */
-        Roboto,                         /* Android */
-        "Noto Sans", "Liberation Sans", /* Linux */
-        "Helvetica Neue", Arial,        /* Basic web fallback */
-        sans-serif,                     /* Catch-all */
 
-        /* Emoji fonts */
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        "Segoe UI Symbol",
-        "Noto Color Emoji";
+    /* system-ui is widely supported now so we don't need platform-specific fallbacks anymore */
+    --font-stack-sans:
+        ui-sans-serif, system-ui,   /* Default user interface font */
+        "Helvetica Neue", Arial,    /* Basic web fallback */
+        sans-serif;                 /* Catch-all */
 
-    --font-family-mono:
-        SFMono-Regular, Menlo, Monaco,          /* macOS, iOS */
-        "Cascadia Mono", Consolas,              /* Windows */
-        "Roboto Mono",                          /* Android */
-        "Liberation Mono", "DejaVu Sans Mono",  /* Linux */
-        "Courier New",                          /* Basic web fallback */
-        monospace;                              /* Catch-all */
+    --font-stack-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    /* ui-monospace is not widely supported yet so we'll still use platform-specific fallbacks here */
+    --font-stack-mono:
+        ui-monospace,                               /* Default user interface font */
+        SFMono-Regular, "SF Mono", Menlo, Monaco,   /* macOS, iOS */
+        "Cascadia Mono", Consolas,                  /* Windows */
+        "Liberation Mono", "DejaVu Sans Mono",      /* Linux */
+        "Roboto Mono",                              /* Android */
+        "Courier New",                              /* Basic web fallback */
+        monospace;                                  /* Catch-all */
 }
 
-html {
+*,
+*::before,
+*::after {
     /*
      * Use a more-intuitive box-sizing model.
-     * But allow overriding (e.g. for relative-positioned elements).
-     * c.f. rule below for *, *::before, *::after
      */
     box-sizing: border-box;
+}
 
+*:not(dialog) {
+    /*
+     * Remove default margin from everything so we can directly control it
+     * Excluding dialogs as they're margin:auto by default so they stay centred in the viewport
+     */
+    margin: 0;
+}
+
+/* Font rules (so that rem can be calculated correctly) and global animation/transition settings */
+html {
     /*
      * Improve consistency of default fonts in all browsers.
      */
-    font-family: var(--font-family-sans);
+    font-family: var(--font-stack-sans), var(--font-stack-emoji);
 
     /*
      * Prevent mobile font-size adjustment
@@ -53,24 +60,17 @@ html {
     -moz-text-size-adjust: none;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
-}
 
-*,
-*::before,
-*::after {
-    box-sizing: inherit;
-}
-
-* {
     /*
-     * Remove default margin from everything so we can directly control it
+     * Opt into transitions and animations to and/or from derived values (where available)
      */
-    margin: 0;
+    interpolate-size: allow-keywords;
 }
 
 body {
     /*
      * WCAG recommended line height for main paragraph content
+     * https://www.w3.org/WAI/WCAG21/Understanding/text-spacing.html
      */
     line-height: 1.5;
 
@@ -87,6 +87,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* General typography */
 h1, h2, h3, h4, h5, h6 {
     /*
      * Tidier line heights for headings
@@ -120,22 +121,18 @@ code, pre, tt, kbd, samp,
     /*
      * Monospace fonts for elements that use it
      */
-    font-family: var(--font-family-mono);
+    font-family: var(--font-stack-mono), var(--font-stack-emoji);
 }
 
-img,
-picture,
-video,
-canvas {
+/* Form elements */
+button,
+input,
+select,
+textarea {
     /*
-     * Make media elements block instead of inline by default
+     * Reset typography styles for form controls to follow the rest of the page
      */
-    display: block;
-
-    /*
-     * Fix overflow
-     */
-    max-width: 100%;
+    font: inherit;
 }
 
 button,
@@ -145,17 +142,6 @@ label {
      * Tidier line heights for single-line form elements
      */
     line-height: 1.1;
-}
-
-button,
-input,
-select,
-textarea {
-    /*
-     * Reset typography styles for form controls
-     */
-    font-family: inherit;
-    font-size: inherit;
 }
 
 textarea:not([rows]) {

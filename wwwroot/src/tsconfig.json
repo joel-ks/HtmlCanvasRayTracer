@@ -4,5 +4,6 @@
     "references": [
         { "path": "./main" },
         { "path": "./worker" },
+        { "path": "./components" },
     ]
 }

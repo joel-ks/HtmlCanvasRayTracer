@@ -25,6 +25,15 @@ export default [
         ]
     },
     {
+        input: "wwwroot/js/components/components.js",
+        output: {
+            dir: "dist/js/components",
+            format: "es",
+            plugins: [terser()]
+        },
+        plugins: [nodeResolve()]
+    },
+    {
         input: "wwwroot/js/worker/worker.js",
         output: {
             dir: "dist/js/worker",

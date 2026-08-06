@@ -34,13 +34,15 @@ pipeline {
                 }
 
                 archiveArtifacts artifacts: "dist/**", onlyIfSuccessful: true
+
+                // TODO: publish artifacts to www over ssh
             }
         }
     }
 
-    post {
-        cleanup {
-            sh "docker image prune --all --force"
-        }
-    }
+    // post {
+    //     cleanup {
+    //         sh "docker image prune --all --force"
+    //     }
+    // }
 }

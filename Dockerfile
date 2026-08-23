@@ -1,7 +1,7 @@
 # Build rust code to WASM
 FROM rust:1.98.0 AS rust
 
-RUN cargo install wasm-pack@0.15
+RUN cargo install wasm-pack@^0.15
 
 WORKDIR /usr/src/rust
 COPY rust/ .

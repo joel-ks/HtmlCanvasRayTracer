@@ -11,16 +11,16 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"] # Note: console_error_panic_hook only takes effect for wasm32 targets
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-rand = "0.8"
+rand = "0.10.2"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 console_error_panic_hook = { version = "0.1.7", optional = true }
 js-sys = "0.3"
-wasm-bindgen = "0.2.84"
+wasm-bindgen = "0.2.127"
 web-sys = { version = "0.3", features = ["console"]}
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
-wasm-bindgen-test = "0.3.34"
+wasm-bindgen-test = "0.3.77"
 
 # Generate DWARF debug info for dev builds
 # https://github.com/rustwasm/wasm-pack/issues/1351#issuecomment-2100231587

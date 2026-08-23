@@ -33,9 +33,9 @@ impl Vec3 {
 
     pub fn range_random(min: f64, max: f64) -> Vec3 {
         Vec3 {
-            x: utils::range_random(min, max),
-            y: utils::range_random(min, max),
-            z: utils::range_random(min, max),
+            x: utils::range_random_f64(min, max),
+            y: utils::range_random_f64(min, max),
+            z: utils::range_random_f64(min, max),
         }
     }
 
@@ -67,8 +67,8 @@ impl Vec3 {
     pub fn random_in_unit_disk() -> Vec3 {
         loop {
             let p = Vec3 {
-                x: utils::range_random(-1.0, 1.0),
-                y: utils::range_random(-1.0, 1.0),
+                x: utils::range_random_f64(-1.0, 1.0),
+                y: utils::range_random_f64(-1.0, 1.0),
                 z: 0.0
             };
 

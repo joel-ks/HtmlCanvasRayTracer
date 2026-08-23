@@ -87,10 +87,10 @@ impl Camera {
 
         for _ in 0..self.samples {
             let ray = self.get_ray(x, y);
-            colour += Camera::ray_colour(&ray, world, self.max_bounces);
+            colour += Camera::ray_colour(ray, world, self.max_bounces);
         }
 
-        return Pixel::from_colour(self.pixel_samples_scale * colour);
+        Pixel::from_colour(self.pixel_samples_scale * colour)
     }
 
     fn get_ray(&self, x: u32, y: u32) -> Ray {
@@ -102,16 +102,18 @@ impl Camera {
             + ((y as f64 + offset.y) * self.pixel_delta_v);
 
         let origin = if self.has_defocus { self.sample_defocus_disk() } else { self.centre };
+        let time = utils::random();
 
         Ray {
             origin,
-            direction: pixel_sample - origin
+            direction: pixel_sample - origin,
+            time
         }
     }
 
     /// Returns the vector to a random point in the \[-.5,-.5\]-\[+.5,+.5\] unit square.
     fn sample_square() -> Vec3 {
-        return Vec3
+        Vec3
         {
             x: utils::random() - 0.5,
             y: utils::random() - 0.5,
@@ -126,42 +128,42 @@ impl Camera {
         self.centre + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
     }
 
-    fn ray_colour(ray: &Ray, world: &impl Hittable, bounce_limit: u32) -> Colour {
-        if bounce_limit <= 0 {
+    fn ray_colour(ray: Ray, world: &impl Hittable, bounce_limit: u32) -> Colour {
+        if bounce_limit == 0 {
             return Colour::origin();
         }
 
         let hit_record = world.hit(
-            ray,
-            &Interval {
+            &ray,
+            Interval {
                 min: 0.001,
-                max: utils::INFINITY,
+                max: f64::INFINITY,
             },
         );
 
         // Trace ray off the object that was hit
         if let Some(hit_record) = hit_record {
-            if let Some(scatter) = hit_record.material.scatter(ray, &hit_record) {
-                return scatter.attenuation * Camera::ray_colour(&scatter.scattered, world, bounce_limit - 1);
+            if let Some(scatter) = hit_record.material.scatter(&ray, &hit_record) {
+                return scatter.attenuation * Camera::ray_colour(scatter.scattered, world, bounce_limit - 1);
             } else {
                 return Colour::origin();
             }
         }
 
-        static START_COLOUR: Colour = Colour {
+        let dir_norm = ray.direction.normalize();
+        let a = 0.5 * (dir_norm.y + 1.0);
+
+        const SKY_COLOUR_TOP: Colour = Colour {
             x: 1.0,
             y: 1.0,
             z: 1.0,
         };
-        static END_COLOUR: Colour = Colour {
+        const SKY_COLOUR_BOTTOM: Colour = Colour {
             x: 0.5,
             y: 0.7,
             z: 1.0,
         };
 
-        let dir_norm = ray.direction.normalize();
-        let a = 0.5 * (dir_norm.y + 1.0);
-
-        return (1.0 - a) * START_COLOUR + a * END_COLOUR;
+        (1.0 - a) * SKY_COLOUR_TOP + a * SKY_COLOUR_BOTTOM
     }
 }

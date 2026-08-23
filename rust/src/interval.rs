@@ -1,23 +1,21 @@
+#[derive(Default, Clone, Copy)]
 pub struct Interval {
     pub min: f64,
     pub max: f64
 }
 
 impl Interval {
-    // pub fn empty() -> Interval {
-    //     Interval {
-    //         min: std::f64::INFINITY,
-    //         max: std::f64::NEG_INFINITY
-    //     }
-    // }
+    pub fn union(a: Interval, b: Interval)  -> Interval {
+        // Create the interval tightly enclosing the two input intervals.
+        Interval {
+            min: if a.min <= b.min { a.min } else { b.min },
+            max: if a.max >= b.max { a.max } else { b.max }
+        }
+    }
 
-    // pub fn size(&self) -> f64 {
-    //     self.max - self.min
-    // }
-
-    // pub fn contains(&self, value: f64) -> bool {
-    //     self.min <= value && value <= self.max
-    // }
+    pub fn size(&self) -> f64 {
+        self.max - self.min
+    }
 
     pub fn surrounds(&self, value: f64) -> bool {
         self.min < value && value < self.max

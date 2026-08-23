@@ -2,28 +2,48 @@ use std::rc::Rc;
 
 use crate::{interval::Interval, material::Material, ray::Ray, vec3::{Point3, Vec3}};
 
-use super::{HitRecord, Hittable};
+use super::{HitRecord, Hittable, Aabb};
 
 pub struct Sphere {
-    centre: Point3,
+    centre: Ray,
     radius: f64,
-    material: Rc<dyn Material>
+    material: Rc<dyn Material>,
+
+    bbox: Aabb
 }
 
 impl Sphere {
     // We need a lifetime here in case Material is ever implemented for a reference
     // https://stackoverflow.com/a/54788788
     pub fn new(centre: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
+        let rvec = Vec3 { x: radius, y: radius, z: radius };
+
         Sphere {
-            centre,
+            centre: Ray { origin: centre, direction: Vec3::origin(), time: 0.0 },
             radius: radius.max(0.0),
-            material: Rc::new(material)
+            material: Rc::new(material),
+            bbox: Aabb::between_points(centre - rvec, centre + rvec)
+        }
+    }
+
+    // We need a lifetime here in case Material is ever implemented for a reference
+    // https://stackoverflow.com/a/54788788
+    pub fn new_with_motion(centre: Point3, centre2: Point3, radius: f64, material: impl Material + 'static) -> Sphere {
+        let rvec = Vec3 { x: radius, y: radius, z: radius };
+        let aabb1 = Aabb::between_points(centre - rvec, centre + rvec);
+        let aabb2 = Aabb::between_points(centre2 - rvec, centre2 + rvec);
+
+        Sphere {
+            centre: Ray { origin: centre, direction: centre2 - centre, time: 0.0 },
+            radius: radius.max(0.0),
+            material: Rc::new(material),
+            bbox: Aabb::union(aabb1, aabb2)
         }
     }
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, ray_test_interval: &Interval) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, ray_test_interval: Interval) -> Option<HitRecord> {
         // Equation for ray(O,D) intersects sphere(C,r):
         // => t^2(D⋅D)-2t(D⋅(O-C))+((O-C)⋅(O-C)-r^2)=0
         // Solve for t to determine if ray intersects at any point:
@@ -33,7 +53,8 @@ impl Hittable for Sphere {
         //      - c = ((O-C)⋅(O-C))−r^2
         // Since b has a factor of -2 we can simplify by setting h = b/-2 = D⋅(O-C)
         // => Formula simplifies to: (h ± sqrt(h^2 - ac)) / a
-        let oc = self.centre - ray.origin; // precalculate as this is part of h and c
+        let current_centre = self.centre.at(ray.time);
+        let oc = current_centre - ray.origin; // precalculate as this is part of h and c
         let a = ray.direction.length_squared();
         let h = Vec3::dot(ray.direction, oc);
         let c = Vec3::dot(oc, oc) - self.radius * self.radius;
@@ -57,7 +78,12 @@ impl Hittable for Sphere {
         }
 
         let p = ray.at(root);
-        let normal = (p - self.centre) / self.radius;
-        return Some(HitRecord::new(ray, root, normal, self.material.clone()));
+        let normal = (p - current_centre) / self.radius;
+
+        Some(HitRecord::new(ray, root, normal, self.material.clone()))
+    }
+
+    fn bounding_box(&self) -> Aabb {
+        self.bbox
     }
 }

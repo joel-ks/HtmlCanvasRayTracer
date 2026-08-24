@@ -1,71 +1,67 @@
 pipeline {
     agent any
 
-    stages {
-        stage ("Build") {
+  stages {
+        stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Build') {
+             steps {
+                script {
+                    docker.image('rust:1.98.0').inside('-u root') {
+                        sh 'cargo install wasm-pack@^0.15' // NOTE: make custom base image with wasm-pack already installed?
+                        sh 'wasm-pack build rust --release --target web'
+                    }
+                }
 
                 script {
-                    docker.build("webcanvasrt/rust", "--target rust .")
-                    docker.build("webcanvasrt/node", "--target node .")
+                    docker.image('node:lts').inside('-u root') {
+                        sh 'npm ci'
+                        sh 'npm run build'
+                    }
                 }
             }
         }
 
-        stage ("Run tests") {
+        stage ('Test') {
             steps {
                 script {
-                    docker.image("webcanvasrt/rust").inside("--rm")
-                    {
-                        dir(path: "/usr/src/rust") {
-                            sh "cargo test --profile release --lib"
-                        }
+                    docker.image('rust:1.98.0').inside('-u root') {
+                        sh 'cargo test --manifest-path "rust/Cargo.toml" --profile release --lib'
                     }
-
-                    sh "docker image rm ${testrunnerImg.imageName()}"
                 }
             }
         }
 
-        stage("Archive") {
+        stage('Archive') {
             when {
                 not { branch 'master' }
             }
 
             steps {
                 script {
-                    docker.image("webcanvasrt/node")
-                        .inside("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
-                        {
-                            dir(path: "/usr/src") {
-                                sh "npm run bundle"
-                            }
-                        }
-
-                    sh "docker image rm ${bundleImg.imageName()}"
+                    docker.image('node:lts').inside('-u root') {
+                        sh 'npm run bundle'
+                    }
                 }
 
-                archiveArtifacts artifacts: "dist/**", onlyIfSuccessful: true
+                archiveArtifacts artifacts: 'dist/**', onlyIfSuccessful: true
             }
         }
 
-        stage("Publish") {
+        stage('Publish') {
             when {
                 branch 'master'
             }
 
             steps {
                 script {
-                    docker.image("webcanvasrt/node")
-                        .inside("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
-                        {
-                            dir(path: "/usr/src") {
-                                sh "npm run bundle"
-                            }
-                        }
-
-                    sh "docker image rm ${bundleImg.imageName()}"
+                    docker.image('node:lts').inside('-u root') {
+                        sh 'npm run bundle'
+                    }
                 }
 
                 sshPublisher(publishers: [sshPublisherDesc(
@@ -89,12 +85,6 @@ pipeline {
                     verbose: false
                 )])
             }
-        }
-    }
-
-    post {
-        cleanup {
-            sh "docker image rm webcanvasrt/node webcanvasrt/rust"
         }
     }
 }

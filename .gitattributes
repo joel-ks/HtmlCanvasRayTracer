@@ -16,7 +16,7 @@
 *.tsx               text
 
 # Fixes syntax highlighting on GitHub to allow comments
-tsconfig.json       linguist-language=JSON-with-Comments
+tsconfig*.json       linguist-language=JSON-with-Comments
 
 # Configs
 *.*ignore           text

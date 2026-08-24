@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        // File layout
+        "rootDir": ".",
+        "outDir": "../js/",
+        "declarationDir": "../types",
+
+        // General compile options
+        "composite": true,
+        "target": "esnext",
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+
+        // Module options
+        "moduleResolution": "bundler", // Modern import resolution rules
+        "moduleDetection": "force", // Every ts file is a module
+        "isolatedModules": true, // Compile modules without reference to other modules (better tooling support)
+
+        // JS compat options
+        "allowJs": true,
+        "checkJs": true,
+
+        // Compile time checks (some of the recommendations were too strict to me)
+        "exactOptionalPropertyTypes": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noUncheckedIndexedAccess": true,
+        "verbatimModuleSyntax": true
+    }
+}

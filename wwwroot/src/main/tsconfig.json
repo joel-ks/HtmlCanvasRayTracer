@@ -1,8 +1,5 @@
 {
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "lib": ["DOM", "ESNext"]
-    },
+    "extends": "../tsconfig-base.json",
     "references": [
         { "path": "../workerTypes" }
     ]

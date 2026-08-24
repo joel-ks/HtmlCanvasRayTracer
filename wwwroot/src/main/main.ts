@@ -1,12 +1,9 @@
-import type { RendererType, WorkerRequest, WorkerUpdate } from "../workerTypes";
-import { rendererTypes } from "../workerTypes";
+import type { WorkerRequest, WorkerUpdate } from "../workerTypes";
 
 interface RayTracerApp {
     canvas: HTMLCanvasElement;
     info: HTMLSpanElement;
-    form: {
-        renderButtons: Partial<Record<RendererType, HTMLButtonElement>>;
-    }
+    renderButton: HTMLButtonElement;
 }
 
 let renderRunning = false;
@@ -21,14 +18,12 @@ try {
 
     const renderWorker = createRenderWorker();
 
-    for (const [rendererType, btn] of (Object.entries(controls.form.renderButtons) as Array<[RendererType, HTMLButtonElement]>)) {
-        btn.addEventListener('click', () => render(rendererType, ctx2d, renderWorker));
-    }
+    controls.renderButton.addEventListener('click', () => render(ctx2d, renderWorker));
 } catch (e) {
     if (e instanceof Error) {
         console.error(e);
 
-        Object.values(controls.form.renderButtons).forEach(btn => btn.classList.add("hidden"));
+        controls.renderButton.classList.add("hidden");
         controls.info.textContent = e.message;
     } else throw e;
 }
@@ -38,11 +33,7 @@ function findControls(): RayTracerApp {
     return {
         canvas: document.getElementById("output") as HTMLCanvasElement,
         info: document.getElementById("info") as HTMLSpanElement,
-        form: {
-            renderButtons: Object.fromEntries(
-                rendererTypes.map(rt => [rt, document.getElementById(`btn-render-${rt}`) as HTMLButtonElement])
-            )
-        }
+        renderButton: document.getElementById("btn-render-wasm") as HTMLButtonElement
     };
 }
 
@@ -53,13 +44,13 @@ function createRenderWorker(): Worker {
     renderWorker.addEventListener('message', (e: MessageEvent<WorkerUpdate>) => {
         controls.info.textContent = e.data.message;
         renderRunning = !e.data.completed;
-        Object.values(controls.form.renderButtons).forEach(btn => btn.disabled = !e.data.completed);
+        controls.renderButton.disabled = !e.data.completed;
     });
 
     renderWorker.addEventListener('error', () => {
         controls.info.textContent = "An error occurred while rendering. Check the console for details.";
         renderRunning = false;
-        Object.values(controls.form.renderButtons).forEach(btn => btn.disabled = false);
+        controls.renderButton.disabled = false;
     });
 
     renderWorker.addEventListener('messageerror', (e) => console.error("Worker could not read message", e));
@@ -67,13 +58,12 @@ function createRenderWorker(): Worker {
     return renderWorker;
 }
 
-function render(rendererType: RendererType, ctx2d: CanvasRenderingContext2D, renderWorker: Worker) {
+function render(ctx2d: CanvasRenderingContext2D, renderWorker: Worker) {
     try {
-        Object.values(controls.form.renderButtons).forEach(btn => btn.disabled = true);
+        controls.renderButton.disabled = true;
 
         const width = controls.canvas.width, height = controls.canvas.height;
         const request: WorkerRequest = {
-            rendererType,
             width,
             height,
             data: new SharedArrayBuffer(width * height * 4)
@@ -83,7 +73,7 @@ function render(rendererType: RendererType, ctx2d: CanvasRenderingContext2D, ren
         renderRunning = true;
         startUpdatingRenderView(new Uint8ClampedArray(request.data), width, height, ctx2d);
     } catch (e) {
-        Object.values(controls.form.renderButtons).forEach(btn => btn.disabled = false);
+        controls.renderButton.disabled = false;
         throw e;
     }
 }

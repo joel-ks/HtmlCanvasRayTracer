@@ -1,46 +1,90 @@
 pipeline {
     agent any
 
-    stages {
-        stage ("Build") {
+  stages {
+        stage('Checkout') {
             steps {
                 checkout scm
-
-                script {
-                    docker.build("rust-base", "--target rust .")
-                    docker.build("node-base", "--target node .")
-                }
             }
         }
 
-        stage ("Run tests") {
-            steps {
+        stage('Build') {
+             steps {
                 script {
-                    def testrunnerImg = docker.build("rust-test", "--target rusttestrunner .")
-
-                    // TODO: how to publish success/coverage reports
-                    sh "docker run --rm ${testrunnerImg.id}"
-                }
-            }
-        }
-
-        stage("Publish") {
-            steps {
-                script {
-                    def bundleImg = docker.build("bundle", "--target bundler .")
-                    bundleImg.withRun("", "/bin/sh") {
-                        sh "docker cp ${it.id}:/usr/src/dist ./dist"
+                    docker.image('rust:1.98.0').inside('-u root') {
+                        sh 'cargo install wasm-pack@^0.15' // NOTE: make custom base image with wasm-pack already installed?
+                        sh 'wasm-pack build rust --release --target web'
                     }
                 }
 
-                archiveArtifacts artifacts: "dist/**", onlyIfSuccessful: true
+                script {
+                    docker.image('node:lts').inside('-u root') {
+                        sh 'npm ci'
+                        sh 'npm run build'
+                    }
+                }
             }
         }
-    }
 
-    post {
-        cleanup {
-            sh "docker image prune --all --force"
+        stage ('Test') {
+            steps {
+                script {
+                    docker.image('rust:1.98.0').inside('-u root') {
+                        sh 'cargo test --manifest-path "rust/Cargo.toml" --profile release --lib'
+                    }
+                }
+            }
+        }
+
+        stage('Archive') {
+            when {
+                not { branch 'master' }
+            }
+
+            steps {
+                script {
+                    docker.image('node:lts').inside('-u root') {
+                        sh 'npm run bundle'
+                    }
+                }
+
+                archiveArtifacts artifacts: 'dist/**', onlyIfSuccessful: true
+            }
+        }
+
+        stage('Publish') {
+            when {
+                branch 'master'
+            }
+
+            steps {
+                script {
+                    docker.image('node:lts').inside('-u root') {
+                        sh 'npm run bundle'
+                    }
+                }
+
+                sshPublisher(publishers: [sshPublisherDesc(
+                    configName: 'Rocinante',
+                    transfers: [sshTransfer(
+                        sourceFiles: 'dist/**',
+                        removePrefix: 'dist/',
+                        remoteDirectory: 'apps/raytracer',
+                        cleanRemote: true,
+                        excludes: '',
+                        execCommand: '',
+                        execTimeout: 120000,
+                        flatten: false,
+                        makeEmptyDirs: false,
+                        noDefaultExcludes: false,
+                        patternSeparator: '[, ]+',
+                        remoteDirectorySDF: false,
+                    )],
+                    usePromotionTimestamp: false,
+                    useWorkspaceInPromotion: false,
+                    verbose: false
+                )])
+            }
         }
     }
 }

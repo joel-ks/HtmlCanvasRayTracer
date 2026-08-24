@@ -1,11 +1,9 @@
 {
-    "extends": "../tsconfig.json",
+    "extends": "../tsconfig-base.json",
     "compilerOptions": {
-        "lib": ["WebWorker", "ESNext"]
+        "lib": ["WebWorker", "ESNext", "ESNext.Disposable"]
     },
     "references": [
-        { "path": "../raytracer" },
-        { "path": "../raytracer_rust" },
         { "path": "../workerTypes" }
     ]
 }

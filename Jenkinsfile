@@ -18,8 +18,9 @@ pipeline {
                 script {
                     docker.image("webcanvasrt/rust").inside("--rm")
                     {
-                        dir(path: "/usr/src/rust")
-                        sh "cargo test --profile release --lib"
+                        dir(path: "/usr/src/rust") {
+                            sh "cargo test --profile release --lib"
+                        }
                     }
 
                     sh "docker image rm ${testrunnerImg.imageName()}"
@@ -37,8 +38,9 @@ pipeline {
                     docker.image("webcanvasrt/node")
                         .inside("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
                         {
-                            dir(path: "/usr/src")
-                            sh "npm run bundle"
+                            dir(path: "/usr/src") {
+                                sh "npm run bundle"
+                            }
                         }
 
                     sh "docker image rm ${bundleImg.imageName()}"
@@ -58,7 +60,9 @@ pipeline {
                     docker.image("webcanvasrt/node")
                         .inside("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
                         {
-                            sh "npm run bundle"
+                            dir(path: "/usr/src") {
+                                sh "npm run bundle"
+                            }
                         }
 
                     sh "docker image rm ${bundleImg.imageName()}"

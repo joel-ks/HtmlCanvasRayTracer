@@ -21,30 +21,4 @@ RUN npm ci
 COPY --link wwwroot/ ./wwwroot
 RUN npm run build
 
-
-FROM rust AS rusttestrunner
-
-# TODO: how to publish test results/coverage?
-ENTRYPOINT ["cargo", "test", "--profile", "release", "--lib"]
-
-
-# Run wasm-pack browser tests
-# FROM rust AS rustbrowsertestrunner
-
-# TODO: how to publish test results/coverage?
-# TODO: how to configure test browser at runtime?
-# TODO: Error: http://127.0.0.1:<random port>/session: status code 500
-# ENTRYPOINT ["wasm-pack", "test", "--release", "--headless", "--firefox"]
-
-
-# Run JS/TS tests
-# FROM node AS nodetestrunner
-
-# TODO: run TypeScript tests (and how to publish results/coverage?)
-
-
-# Publish the web app (HTML + CSS + JS + WASM)
-FROM node AS bundler
-
 VOLUME /usr/src/dist/
-ENTRYPOINT ["npm", "run", "bundle"]

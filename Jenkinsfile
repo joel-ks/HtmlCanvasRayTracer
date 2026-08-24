@@ -7,8 +7,8 @@ pipeline {
                 checkout scm
 
                 script {
-                    docker.build("rust-base", "--target rust .")
-                    docker.build("node-base", "--target node .")
+                    docker.build("webcanvasrt/rust", "--target rust .")
+                    docker.build("webcanvasrt/node", "--target node .")
                 }
             }
         }
@@ -16,8 +16,11 @@ pipeline {
         stage ("Run tests") {
             steps {
                 script {
-                    def testrunnerImg = docker.build("rust-test", "--target rusttestrunner .")
-                    testrunnerImg.run("--rm")
+                    docker.image("webcanvasrt/rust").inside("--rm")
+                    {
+                        sh "cargo test --profile release --lib"
+                    }
+
                     sh "docker image rm ${testrunnerImg.imageName()}"
                 }
             }
@@ -30,8 +33,12 @@ pipeline {
 
             steps {
                 script {
-                    def bundleImg = docker.build("bundle", "--target bundler .")
-                    bundleImg.run("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
+                    docker.image("webcanvasrt/node")
+                        .inside("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
+                        {
+                            sh "npm run bundle"
+                        }
+
                     sh "docker image rm ${bundleImg.imageName()}"
                 }
 
@@ -46,8 +53,12 @@ pipeline {
 
             steps {
                 script {
-                    def bundleImg = docker.build("bundle", "--target bundler .")
-                    bundleImg.run("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
+                    docker.image("webcanvasrt/node")
+                        .inside("--rm --mount type=bind,src=./dist,dst=/usr/src/dist,bind-create-src")
+                        {
+                            sh "npm run bundle"
+                        }
+
                     sh "docker image rm ${bundleImg.imageName()}"
                 }
 
@@ -77,7 +88,7 @@ pipeline {
 
     post {
         cleanup {
-            sh "docker image rm node-base rust-base"
+            sh "docker image rm webcanvasrt/node webcanvasrt/rust"
         }
     }
 }

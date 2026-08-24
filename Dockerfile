@@ -4,7 +4,7 @@ FROM rust:1.98.0 AS rust
 RUN cargo install wasm-pack@^0.15
 
 WORKDIR /usr/src/rust
-COPY rust/ .
+COPY --link rust/ .
 
 RUN wasm-pack build --release --target web
 
@@ -14,11 +14,11 @@ FROM node:lts AS node
 
 WORKDIR /usr/src
 
-COPY package.json package-lock.json rollup.config.mjs .
+COPY --link package.json package-lock.json rollup.config.mjs ./
 COPY --from=rust /usr/src/rust/pkg ./rust/pkg
 RUN npm ci
 
-COPY wwwroot/ ./wwwroot
+COPY --link wwwroot/ ./wwwroot
 RUN npm run build
 
 
@@ -46,7 +46,5 @@ ENTRYPOINT ["cargo", "test", "--profile", "release", "--lib"]
 # Publish the web app (HTML + CSS + JS + WASM)
 FROM node AS bundler
 
-RUN npm run bundle
-
-
-# TODO: how to distribute this app? (Nginx server, copy bundle to another image, ...)
+VOLUME /usr/src/dist/
+ENTRYPOINT ["npm", "run", "bundle"]

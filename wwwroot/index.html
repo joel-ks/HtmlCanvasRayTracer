@@ -9,11 +9,33 @@
         <link rel="icon" href="data:," />
         <link rel="stylesheet" href="css/reset.css" />
         <link rel="stylesheet" href="css/main.css" />
+
+        <script src="js/components/components.js" type="module" async></script>
     </head>
     <body>
-        <canvas id="output" width="1280" height="720">Canvas is not supported</canvas>
+        <header>
+            <h1>Web Canvas Ray Tracer</h1>
+        </header>
+
+        <section class="stack">
+            <canvas id="output" width="1280" height="720">Canvas is not supported</canvas>
+            <details id="settings-form" class="overlay" open>
+                <summary>Settings</summary>
+                <form>
+                    <jks-input name="fovDegrees" type="number">Field of view (°)</jks-input>
+                    <jks-coordinate-input name="lookFrom">Look from</jks-coordinate-input>
+                    <jks-coordinate-input name="lookAt">Look at</jks-coordinate-input>
+                    <jks-coordinate-input name="up">Up</jks-coordinate-input>
+                    <jks-input name="defocusAngle" type="number">Defocus (°)</jks-input>
+                    <jks-input name="focalLength" type="number">Focal length</jks-input>
+                    <jks-input name="samples" type="number">Samples</jks-input>
+                    <jks-input name="maxBounces" type="number">Max bounces</jks-input>
+                    <hr>
+                    <button id="btn-render-wasm">Render</button>
+                </form>
+            </form>
+        </section>
         <br />
-        <button id="btn-render-wasm">Render</button>
         <span id="info"></span>
 
         <script src="js/main/main.js" type="module" async></script>

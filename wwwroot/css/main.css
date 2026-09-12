@@ -1,0 +1,28 @@
+.stack {
+    position: relative;
+    max-width: fit-content;
+    margin-top: 1em;
+
+    > .overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        max-height: 100%;
+    }
+
+    &:not(:hover) > .overlay:not(:active, :focus, :focus-within, [open]) {
+        opacity: 0;
+    }
+}
+
+.overlay {
+    background-color: lightgray;
+    padding: 0.1em 0.25em;
+    opacity: 25%;
+
+    &[open], &:hover {
+        opacity: 100%;
+    }
+
+    transition: opacity 0.2s;
+}

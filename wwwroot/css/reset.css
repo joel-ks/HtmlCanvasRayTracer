@@ -3,30 +3,44 @@
  * Based on:
  * - https://www.joshwcomeau.com/css/custom-css-reset/
  * - https://piccalil.li/blog/a-more-modern-css-reset/
+ * - https://github.com/sindresorhus/modern-normalize/
  */
 
-/* Global CSS custom properties */
+/* CSS custom properties */
+@property --font-stack-sans {
+    syntax: "<string>#";
+    inherits: true;
+    initial-value: "";
+}
+
+@property --font-stack-emoji {
+    syntax: "<string>#";
+    inherits: true;
+    initial-value: "";
+}
+
+@property --font-stack-mono {
+    syntax: "<string>#";
+    inherits: true;
+    initial-value: "";
+}
+
 :root {
-
-    /* Cross-platform font families */
-
-    /* system-ui is widely supported now so we don't need platform-specific fallbacks anymore */
     --font-stack-sans:
-        ui-sans-serif, system-ui,   /* Default user interface font */
-        "Helvetica Neue", Arial,    /* Basic web fallback */
-        sans-serif;                 /* Catch-all */
+        ui-sans-serif, system-ui,
+        "Helvetica", "Arial",
+        sans-serif;
 
-    --font-stack-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-stack-sans: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
-    /* ui-monospace is not widely supported yet so we'll still use platform-specific fallbacks here */
     --font-stack-mono:
-        ui-monospace,                               /* Default user interface font */
-        SFMono-Regular, "SF Mono", Menlo, Monaco,   /* macOS, iOS */
-        "Cascadia Mono", Consolas,                  /* Windows */
-        "Liberation Mono", "DejaVu Sans Mono",      /* Linux */
-        "Roboto Mono",                              /* Android */
-        "Courier New",                              /* Basic web fallback */
-        monospace;                                  /* Catch-all */
+        ui-monospace,                                   /* Default user interface font */
+        "SFMono-Regular", "SF Mono", "Menlo", "Monaco", /* macOS, iOS */
+        "Cascadia Code", "Consolas",                    /* Windows */
+        "Liberation Mono", "DejaVu Sans Mono",          /* Linux */
+        "Roboto Mono", "Droid Sans Mono",               /* Android */
+        "Courier New",                                  /* Basic web fallback */
+        monospace;                                      /* Catch-all */
 }
 
 *,
@@ -38,10 +52,12 @@
     box-sizing: border-box;
 }
 
-*:not(dialog) {
+*:not(dialog, hr) {
     /*
      * Remove default margin from everything so we can directly control it
-     * Excluding dialogs as they're margin:auto by default so they stay centred in the viewport
+     * Excluded:
+     * - dialog - they're margin:auto by default so they stay centred in the viewport
+     * - hr - we expect them to have some margin to provide clear separation
      */
     margin: 0;
 }
@@ -77,14 +93,16 @@ body {
     /*
      * Make the body fill the viewport
      */
-    min-height: 100vh; /* Fallback for any browsers that don't support dvh */
-    min-height: 100dvh;
+    min-height: 100vh; /* Fallback for any browsers that don't support svh */
+    min-height: 100svh;
 
     /*
      * Nicer font smoothing
-     * Only affects Webkit browsers on macOS. All other platforms do this already.
+     * Only affects Webkit/Firefox browsers on macOS. All other platforms do this already.
+     * https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-smooth
      */
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* General typography */
@@ -116,8 +134,7 @@ p {
     overflow-wrap: break-word;
 }
 
-code, pre, tt, kbd, samp,
-.font-monospace  {
+code, pre, kbd, samp {
     /*
      * Monospace fonts for elements that use it
      */

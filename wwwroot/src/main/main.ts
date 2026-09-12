@@ -3,6 +3,7 @@ import type { WorkerRequest, WorkerUpdate } from "../workerTypes";
 interface RayTracerApp {
     canvas: HTMLCanvasElement;
     info: HTMLSpanElement;
+    settingsForm: HTMLDetailsElement,
     renderButton: HTMLButtonElement;
 }
 
@@ -33,6 +34,7 @@ function findControls(): RayTracerApp {
     return {
         canvas: document.getElementById("output") as HTMLCanvasElement,
         info: document.getElementById("info") as HTMLSpanElement,
+        settingsForm: document.getElementById("settings-form") as HTMLDetailsElement,
         renderButton: document.getElementById("btn-render-wasm") as HTMLButtonElement
     };
 }
@@ -61,6 +63,7 @@ function createRenderWorker(): Worker {
 function render(ctx2d: CanvasRenderingContext2D, renderWorker: Worker) {
     try {
         controls.renderButton.disabled = true;
+        controls.settingsForm.open = false;
 
         const width = controls.canvas.width, height = controls.canvas.height;
         const request: WorkerRequest = {

@@ -1,5 +1,3 @@
-const inputId = "an-input";
-
 const template = /* html */`
 <style>
     :host { display: block; }
@@ -11,18 +9,22 @@ const template = /* html */`
         line-height: 1.1;
         font: inherit;
     }
+    input {
+        width: 10ch;
+    }
 </style>
-<label for="${inputId}"><slot></slot>:</label>
-<input id="${inputId}" part="input" />
+<label ><slot></slot>:</label>
+<input id="input-x" part="input" type="number" placeholder="X" />
+<input id="input-x" part="input" type="number" placeholder="Y" />
+<input id="input-x" part="input" type="number" placeholder="Z" />
 `;
 
 const attrDisabled = "disabled";
 const attrName = "name"; // Value is used by the associated form when we call setFormValue
 const attrRequired = "required";
-const attrType = "type";
 const attrValue = "value";
 
-export default class FormInput extends HTMLElement {
+export default class CoordinateInput extends HTMLElement {
 
     // Custom element metadata
     static get formAssociated(): boolean {
@@ -30,15 +32,14 @@ export default class FormInput extends HTMLElement {
     }
 
     static get observedAttributes(): string[] {
-        return [attrDisabled, attrType, attrValue];
+        return [attrDisabled, attrValue];
     }
 
     // Custom element helper values
     #shadowRoot: ShadowRoot;
     #internals: ElementInternals;
 
-    // Child elements
-    #inputElem: HTMLInputElement;
+    #inputs: [HTMLInputElement, HTMLInputElement, HTMLInputElement];
 
     constructor() {
         super();
@@ -48,8 +49,13 @@ export default class FormInput extends HTMLElement {
 
         this.#shadowRoot.innerHTML = template;
 
-        this.#inputElem = this.#shadowRoot.getElementById(inputId) as HTMLInputElement;
-        this.#inputElem.addEventListener("input", this.#onInput.bind(this), { passive: true });
+        this.#inputs = [
+            this.#shadowRoot.getElementById("input-x") as HTMLInputElement,
+            this.#shadowRoot.getElementById("input-y") as HTMLInputElement,
+            this.#shadowRoot.getElementById("input-z") as HTMLInputElement,
+        ];
+
+        for(const i of this.#inputs) i.addEventListener("input", this.#onInput.bind(this), { passive: true });
     }
 
     // Properties
@@ -81,21 +87,18 @@ export default class FormInput extends HTMLElement {
         else this.removeAttribute(attrRequired);
     }
 
-    get type(): string | null {
-        return this.getAttribute(attrType);
+    get value(): [number, number, number] {
+        return [
+            Number(this.#inputs[0].value),
+            Number(this.#inputs[1].value),
+            Number(this.#inputs[2].value)
+        ];
     }
 
-    set type(value: string | null) {
-        if (value !== null) this.setAttribute(attrType, value);
-        else this.removeAttribute(attrType);
-    }
-
-    get value(): string {
-        return this.#inputElem.value;
-    }
-
-    set value(value: string) {
-        this.#inputElem.value = value;
+    set value(value: [number, number, number]) {
+        this.#inputs[0].value = value[0].toString();
+        this.#inputs[1].value = value[1].toString();
+        this.#inputs[2].value = value[2].toString();
     }
 
     // The following properties and methods aren't strictly required,
@@ -111,13 +114,11 @@ export default class FormInput extends HTMLElement {
     connectedCallback() {
         this.#upgradeProperty(attrDisabled);
         this.#upgradeProperty(attrRequired);
-        this.#upgradeProperty(attrType);
     }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
         switch (name) {
             case attrDisabled: this.#disabledChanged(newValue !== null);
-            case attrType: this.#typeChanged(newValue);
             case attrValue: this.#valueChanged(newValue);
         }
     }
@@ -130,23 +131,21 @@ export default class FormInput extends HTMLElement {
     // Attribute change handlers
 
     #disabledChanged(value: boolean) {
-        this.#inputElem.disabled = value;
-    }
-
-    #typeChanged(newValue: string | null) {
-        if (newValue !== null) this.#inputElem.type = newValue;
-        else this.#inputElem.removeAttribute("type");
+        for (const input of this.#inputs) input.disabled = value;
     }
 
     #valueChanged(newValue: string | null) {
-        if (newValue !== null) this.#inputElem.setAttribute("value", newValue);
-        else this.#inputElem.removeAttribute("value");
+            var parts = newValue?.split(",") ?? [];
+            this.#inputs[0].value = parts[0] ?? "";
+            this.#inputs[1].value = parts[1] ?? "";
+            this.#inputs[2].value = parts[2] ?? "";
     }
 
     // Event handlers
 
     #onInput() {
-        if (this.#validate()) this.#internals.setFormValue(this.#inputElem.value);
+        if (this.#validate())
+            this.#internals.setFormValue(`[${this.#inputs[0].value},${this.#inputs[1].value},${this.#inputs[2].value}]`);
     }
 
     // Other private methods
@@ -154,7 +153,7 @@ export default class FormInput extends HTMLElement {
     #validate() {
         if (this.required && !this.#hasValue())
         {
-            this.#internals.setValidity({ valueMissing: true }, "This value is required", this.#inputElem);
+            this.#internals.setValidity({ valueMissing: true }, "This value is required", this);
             return false;
         }
         else {
@@ -165,8 +164,11 @@ export default class FormInput extends HTMLElement {
     }
 
     #hasValue() {
-        return this.#inputElem.value !== null
-            && this.#inputElem.value.trim() !== "";
+        for(const i of this.#inputs) {
+            if (i.value === null || i.value.trim() === "") return false;
+        }
+
+        return true;
     }
 
     // TODO:
